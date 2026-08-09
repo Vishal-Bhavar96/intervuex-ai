@@ -1,0 +1,56 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Python / Backend
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.nox/
+.hypothesis/
+.ruff_cache/
+.mypy_cache/
+
+# Databases & Dynamic Storage
+backend/*.db
+backend/*.sqlite3
+backend/intervuex.db
+backend/test_intervuex.db
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Python Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs & System Files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Assistant & Agent Artifacts
+.gemini/
