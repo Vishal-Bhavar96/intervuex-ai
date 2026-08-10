@@ -21,12 +21,28 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
 
+  const recognitionRef = React.useRef<any>(null);
+  const baseTextRef = React.useRef<string>('');
+
   // Timer interval
   useEffect(() => {
     const interval = setInterval(() => {
       setTimerSeconds(prev => prev + 1);
     }, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Clean up speech recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
   }, []);
 
   // Fetch interview data
@@ -64,6 +80,14 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
     if (!SpeechRecognition) return;
 
     if (isRecording) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // ignore
+        }
+        recognitionRef.current = null;
+      }
       setIsRecording(false);
     } else {
       const recognition = new SpeechRecognition();
@@ -71,18 +95,31 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
       recognition.interimResults = true;
       recognition.lang = 'en-US';
 
+      baseTextRef.current = answerText;
+
       recognition.onstart = () => setIsRecording(true);
-      recognition.onend = () => setIsRecording(false);
+      recognition.onend = () => {
+        setIsRecording(false);
+        recognitionRef.current = null;
+      };
 
       recognition.onresult = (event: any) => {
         let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
+        for (let i = 0; i < event.results.length; i++) {
           transcript += event.results[i][0].transcript;
         }
-        setAnswerText(prev => prev + ' ' + transcript);
+        const combined = baseTextRef.current 
+          ? `${baseTextRef.current.trim()} ${transcript.trim()}` 
+          : transcript.trim();
+        setAnswerText(combined);
       };
 
-      recognition.start();
+      recognitionRef.current = recognition;
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error('Speech recognition start failed', err);
+      }
     }
   };
 
