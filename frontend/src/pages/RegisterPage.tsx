@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { UserPlus, Mail, Key, User } from 'lucide-react';
+import { UserPlus, Mail, Key, User, Eye, EyeOff } from 'lucide-react';
 
 interface RegisterPageProps {
   onSuccess: () => void;
@@ -12,6 +12,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('CANDIDATE');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -85,14 +86,22 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
             <div style={{ position: 'relative' }}>
               <Key size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
               <input 
-                type="password" 
+                type={showPassword ? 'text' : 'password'} 
                 className="form-input" 
-                style={{ paddingLeft: '2.4rem' }}
+                style={{ paddingLeft: '2.4rem', paddingRight: '2.5rem' }}
                 placeholder="At least 8 characters"
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
               />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
