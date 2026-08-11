@@ -151,7 +151,11 @@ class InterviewEngineService:
             expected_topics_json=json.dumps(q_data.get("expected_topics", [])),
             follow_up_depth=q_data.get("follow_up_depth", 0),
             code_starter=q_data.get("code_starter"),
-            code_language=q_data.get("code_language", "python")
+            code_language=q_data.get("code_language", "python"),
+            resume_source=q_data.get("resume_source", "RESUME"),
+            skill_name=q_data.get("skill"),
+            project_title=q_data.get("project"),
+            reasons_json=json.dumps(q_data.get("reasons", [q_data.get("reason")] if q_data.get("reason") else []))
         )
 
         db.add(question)

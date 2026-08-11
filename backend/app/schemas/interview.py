@@ -42,9 +42,14 @@ class InterviewQuestionResponse(BaseModel):
     follow_up_depth: int = 0
     code_starter: Optional[str] = None
     code_language: Optional[str] = "python"
+    resume_source: Optional[str] = "RESUME"
+    skill: Optional[str] = None
+    project: Optional[str] = None
+    reasons: List[str] = []
     answer: Optional[AnswerSubmit] = None
     evaluation: Optional[AnswerEvaluationResponse] = None
     model_config = ConfigDict(from_attributes=True)
+
 
 class InterviewScoreResponse(BaseModel):
     id: int

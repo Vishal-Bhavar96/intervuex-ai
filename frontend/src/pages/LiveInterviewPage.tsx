@@ -259,9 +259,29 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
                   <Bot size={20} />
                 </div>
                 <div>
-                  <strong style={{ color: '#1E3A5F', display: 'block' }}>IntervueX AI Interviewer</strong>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <strong style={{ color: '#1E3A5F', display: 'block' }}>IntervueX AI Interviewer</strong>
+                    <span 
+                      className="badge" 
+                      style={{ 
+                        fontSize: '0.7rem', 
+                        fontWeight: '800', 
+                        letterSpacing: '0.04em',
+                        background: (currentQuestion.resume_source || '').includes('PROJECT') ? '#F3E8FF' :
+                                    (currentQuestion.resume_source || '').includes('JOB') ? '#DCFCE7' :
+                                    (currentQuestion.resume_source || '').includes('HR') ? '#FEF3C7' :
+                                    (currentQuestion.resume_source || '').includes('CODING') ? '#FCE7F3' : '#E0F2FE',
+                        color: (currentQuestion.resume_source || '').includes('PROJECT') ? '#6B21A8' :
+                               (currentQuestion.resume_source || '').includes('JOB') ? '#15803D' :
+                               (currentQuestion.resume_source || '').includes('HR') ? '#B45309' :
+                               (currentQuestion.resume_source || '').includes('CODING') ? '#9D174D' : '#0369A1'
+                      }}
+                    >
+                      {currentQuestion.resume_source ? `[ ${currentQuestion.resume_source} ]` : `[ RESUME-BASED ]`}
+                    </span>
+                  </div>
                   {currentQuestion.follow_up_depth > 0 && (
-                    <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
+                    <span className="badge badge-warning" style={{ fontSize: '0.7rem', marginTop: '0.2rem' }}>
                       ADAPTIVE FOLLOW-UP QUESTION
                     </span>
                   )}
@@ -319,12 +339,25 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
               )}
             </div>
 
-            {currentQuestion.context_reason && (
-              <p style={{ fontSize: '0.85rem', color: '#64748B', background: '#F8FAFC', padding: '0.6rem 0.8rem', borderRadius: '6px' }}>
-                <strong>Interviewer Rationale:</strong> {currentQuestion.context_reason}
-              </p>
-            )}
+            {/* Why You're Being Asked This Box */}
+            <div style={{ background: '#F8FAFC', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+              <strong style={{ fontSize: '0.825rem', color: '#1E3A5F', display: 'block', marginBottom: '0.35rem' }}>
+                Why you're being asked this:
+              </strong>
+              {currentQuestion.reasons && currentQuestion.reasons.length > 0 ? (
+                <ul style={{ paddingLeft: '1.25rem', fontSize: '0.825rem', color: '#475569', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                  {currentQuestion.reasons.map((r, idx) => (
+                    <li key={idx}>{r}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ fontSize: '0.825rem', color: '#475569', margin: 0 }}>
+                  {currentQuestion.context_reason || 'Evaluating technical depth and project rationale based on your candidate profile.'}
+                </p>
+              )}
+            </div>
           </div>
+
 
 
           {/* Candidate Answer Box */}

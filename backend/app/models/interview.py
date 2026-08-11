@@ -47,7 +47,13 @@ class InterviewQuestion(Base):
     # Optional fields for coding questions
     code_starter = Column(Text, nullable=True)
     code_language = Column(String(50), default="python")
-    
+
+    # Metadata for placement-oriented resume-aware question badges
+    resume_source = Column(String(255), default="RESUME")
+    skill_name = Column(String(100), nullable=True)
+    project_title = Column(String(255), nullable=True)
+    reasons_json = Column(Text, nullable=True)
+
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     interview = relationship("Interview", back_populates="questions")

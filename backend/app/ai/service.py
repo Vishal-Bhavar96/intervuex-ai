@@ -167,78 +167,189 @@ class MockAIService(AIServiceInterface):
         # Check projects or skills from resume
         projects = candidate_context.get("projects", [])
         skills = candidate_context.get("skills", [])
-        project_title = projects[0].get("title") if projects else "your recent project"
-        project_techs = projects[0].get("technologies", "Python, SQL") if projects else "Python"
-        skill_name = skills[0].get("name") if skills else "Python"
+        target_role = candidate_context.get("target_role") or "Software Engineer"
+        
+        project_title = projects[0].get("title") if projects else "Secure File Sharing System"
+        project_techs = projects[0].get("technologies") if projects else "Python, Django, SQL"
+        
+        skill_names = [s.get("name") if isinstance(s, dict) else str(s) for s in skills] if skills else ["Python", "Django", "SQL", "Git"]
+        primary_skill = skill_names[0] if skill_names else "Python"
+        second_skill = skill_names[1] if len(skill_names) > 1 else "Django"
+        db_skill = next((s for s in skill_names if any(kw in s.lower() for kw in ["sql", "db", "postgres"])), "SQL")
 
-        if interview_type == "PROJECT_DEFENSE":
-            questions = [
-                {
-                    "question": f"Explain the architecture of your project '{project_title}' and why you chose {project_techs}.",
-                    "question_type": "project",
-                    "expected_topics": ["Architecture", "Tech choice", "Data flow"],
-                    "reason": "Evaluating architectural decision-making and rationale for project technology choices."
-                },
-                {
-                    "question": f"In '{project_title}', how did you handle authentication, data protection, and secure communication?",
-                    "question_type": "project",
-                    "expected_topics": ["JWT/OAuth", "Encryption", "Role-based access control"],
-                    "reason": "Assessing security standards and data protection measures in your project."
-                },
-                {
-                    "question": f"If '{project_title}' scaled to 100,000 active daily users, what performance bottlenecks would occur and how would you redesign the backend?",
-                    "question_type": "project",
-                    "expected_topics": ["Caching", "Database Indexing", "Load Balancing", "Microservices"],
-                    "reason": "Testing scalability foresight and system design principles."
-                }
-            ]
-            idx = (sequence_number - 1) % len(questions)
-            res = questions[idx]
-        elif interview_type == "CODING":
+        # Placement-Oriented Company-Style Interview Questions for Freshers
+        fresher_sequence = [
+            {
+                "question": f"Can you briefly introduce yourself and provide an overview of your project, '{project_title}'?",
+                "question_type": "resume",
+                "resume_source": "RESUME",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Evaluating candidate communication and project overview for '{project_title}'.",
+                "reasons": [
+                    f"✓ Candidate Target Role: {target_role}",
+                    f"✓ Resume Project: {project_title}",
+                    f"✓ Primary Tech Stack: {primary_skill}, {second_skill}"
+                ],
+                "expected_topics": ["Self Introduction", "Project Purpose", "Tech Stack Overview"]
+            },
+            {
+                "question": f"What was your individual role in developing '{project_title}', and what core features did you personally write?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Assessing hands-on development contribution to '{project_title}'.",
+                "reasons": [
+                    f"✓ Project: {project_title} listed in resume",
+                    "✓ Evaluating hands-on feature ownership and coding role"
+                ],
+                "expected_topics": ["Core Features", "Individual Contribution", "Implementation Details"]
+            },
+            {
+                "question": f"Why did you choose {second_skill} for developing '{project_title}' over other framework options?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": second_skill,
+                "project": project_title,
+                "reason": f"Assessing technology selection rationale for '{project_title}'.",
+                "reasons": [
+                    f"✓ Technology {second_skill} used in {project_title}",
+                    "✓ Evaluating architectural decision-making & rationale"
+                ],
+                "expected_topics": [second_skill, "Framework Rationale", "Development Speed"]
+            },
+            {
+                "question": f"Your resume highlights {primary_skill}. Can you explain the difference between a list and a tuple in {primary_skill}, and when you should use a tuple?",
+                "question_type": "technical",
+                "resume_source": "RESUME",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Testing programming language fundamentals in {primary_skill}.",
+                "reasons": [
+                    f"✓ {primary_skill} listed as technical skill",
+                    "✓ Testing memory immutability and core syntax fundamentals"
+                ],
+                "expected_topics": [primary_skill, "Data Structures", "Immutability vs Mutability"]
+            },
+            {
+                "question": f"In database design for '{project_title}' or {db_skill} queries, what is the difference between a Primary Key and a Foreign Key, and how do JOINs connect them?",
+                "question_type": "technical",
+                "resume_source": "RESUME",
+                "skill": db_skill,
+                "project": project_title,
+                "reason": f"Testing database design and relational SQL fundamentals.",
+                "reasons": [
+                    f"✓ {db_skill} listed in technical skills section",
+                    f"✓ Relational schema design in {project_title}"
+                ],
+                "expected_topics": [db_skill, "Primary Key vs Foreign Key", "SQL JOINs", "Database Schema"]
+            },
+            {
+                "question": f"How did you implement user authentication and data security in '{project_title}' to protect candidate data?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": second_skill,
+                "project": project_title,
+                "reason": f"Evaluating authentication logic and session security in '{project_title}'.",
+                "reasons": [
+                    f"✓ Security module in {project_title}",
+                    "✓ Evaluating authentication & access control basics"
+                ],
+                "expected_topics": ["User Authentication", "Passwords/Hashing", "Session Management"]
+            },
+            {
+                "question": f"How did you structure database tables for '{project_title}', and how did you prevent duplicate records?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": db_skill,
+                "project": project_title,
+                "reason": f"Assessing database table design and constraint validation.",
+                "reasons": [
+                    f"✓ Project database stack: {db_skill}",
+                    "✓ Assessing normalization & unique constraint validation"
+                ],
+                "expected_topics": ["Database Tables", "Constraints/Unique Keys", "Data Integrity"]
+            },
+            {
+                "question": f"What was one technical bug or problem you encountered while developing '{project_title}', and how did you debug and resolve it?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": "Evaluating problem-solving approach and technical resilience.",
+                "reasons": [
+                    f"✓ Project: {project_title}",
+                    "✓ Testing debugging methodology and problem solving"
+                ],
+                "expected_topics": ["Debugging", "Bug Fixing", "Troubleshooting"]
+            },
+            {
+                "question": f"For your target role as {target_role}, how would you design a simple REST API endpoint (e.g. GET /api/data) using {primary_skill}?",
+                "question_type": "job_match",
+                "resume_source": "JOB MATCH",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Evaluating REST API design principles for target role '{target_role}'.",
+                "reasons": [
+                    f"✓ Target Role: {target_role}",
+                    f"✓ Skill Alignment: {primary_skill} REST API design"
+                ],
+                "expected_topics": ["REST API", "HTTP Verbs", "JSON Formatting"]
+            },
+            {
+                "question": f"Why are you interested in a {target_role} position, and where do you see your technical skills growing in the next two years?",
+                "question_type": "hr",
+                "resume_source": "HR",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Assessing career motivation and placement readiness for {target_role}.",
+                "reasons": [
+                    f"✓ Target Role: {target_role}",
+                    "✓ Evaluating career motivation, communication, and placement fit"
+                ],
+                "expected_topics": ["Career Motivation", "Placement Readiness", "Communication"]
+            }
+        ]
+
+        if interview_type == "CODING":
             res = {
-                "question": "Write a Python function `two_sum(nums: list[int], target: int) -> list[int]` that returns indices of the two numbers such that they add up to target. Optimize for O(n) time complexity.",
+                "question": f"Write a {primary_skill} function `two_sum(nums: list[int], target: int) -> list[int]` that returns indices of the two numbers such that they add up to target. Optimize for O(n) time complexity.",
                 "question_type": "coding",
+                "resume_source": "CODING",
+                "skill": primary_skill,
+                "project": project_title,
                 "expected_topics": ["Hash Map", "Array Search", "Time Complexity O(n)"],
                 "reason": "Testing fundamental problem-solving and optimal data structure usage.",
+                "reasons": [
+                    f"✓ Skill: {primary_skill} problem solving",
+                    "✓ Testing optimal data structure selection & time complexity"
+                ],
                 "code_starter": "def two_sum(nums: list[int], target: int) -> list[int]:\n    # Implement optimal O(n) solution using a dictionary\n    lookup = {}\n    for i, num in enumerate(nums):\n        diff = target - num\n        if diff in lookup:\n            return [lookup[diff], i]\n        lookup[num] = i\n    return []\n",
-                "code_language": "python"
+                "code_language": primary_skill.lower()
             }
-        elif interview_type == "BEHAVIORAL" or interview_type == "HR":
+        elif interview_type == "HR" or interview_type == "BEHAVIORAL":
             res = {
-                "question": "Describe a challenging bug or architectural conflict you encountered during project development. How did you resolve it?",
-                "question_type": "behavioral",
-                "expected_topics": ["STAR Method", "Problem Solving", "Conflict Resolution", "Teamwork"],
-                "reason": "Evaluating soft skills, emotional intelligence, and resilience under technical pressure."
+                "question": f"Why are you interested in starting your career as a {target_role}, and how have your academic projects prepared you for this role?",
+                "question_type": "hr",
+                "resume_source": "HR",
+                "skill": primary_skill,
+                "project": project_title,
+                "expected_topics": ["Behavioral STAR", "Career Ambition", "Project Alignment"],
+                "reason": f"Evaluating career alignment and communication for entry-level {target_role}.",
+                "reasons": [
+                    f"✓ Target Role: {target_role}",
+                    "✓ Assessing soft skills, career goals, and placement motivation"
+                ]
             }
         else:
-            # Default Technical / Job-Specific
-            job_skill = job_context.get("required_skills", [skill_name])[0] if job_context else skill_name
-            tech_questions = [
-                {
-                    "question": f"Explain how {job_skill} handles state management or asynchronous requests in production.",
-                    "question_type": "technical",
-                    "expected_topics": [job_skill, "Asynchronous I/O", "Performance Optimization"],
-                    "reason": f"Evaluating depth of knowledge in core required skill {job_skill}."
-                },
-                {
-                    "question": f"What is the difference between synchronous and asynchronous database querying in a REST API built with {job_skill}?",
-                    "question_type": "technical",
-                    "expected_topics": ["Database Connections", "Async/Await", "Connection Pooling"],
-                    "reason": "Assessing database integration principles and concurrency."
-                },
-                {
-                    "question": "How do database indexes improve query speed, and under what circumstances can adding an index degrade write performance?",
-                    "question_type": "technical",
-                    "expected_topics": ["B-Tree Indexes", "Read vs Write Latency", "Database Internals"],
-                    "reason": "Testing storage engine and indexing mechanics."
-                }
-            ]
-            idx = (sequence_number - 1) % len(tech_questions)
-            res = tech_questions[idx]
+            idx = (sequence_number - 1) % len(fresher_sequence)
+            res = fresher_sequence[idx]
 
         res["difficulty"] = difficulty
         res["follow_up_depth"] = 0
         return res
+
 
     async def evaluate_answer(
         self,

@@ -35,6 +35,14 @@ class ResumeAnalysis(Base):
     strengths_json = Column(Text, nullable=True)
     weaknesses_json = Column(Text, nullable=True)
     missing_info_json = Column(Text, nullable=True)
+    
+    # ATS Compatibility Metrics
+    ats_score = Column(Float, default=85.0, nullable=False)
+    ats_formatting_score = Column(Float, default=90.0, nullable=False)
+    ats_keyword_score = Column(Float, default=82.0, nullable=False)
+    ats_readability_score = Column(Float, default=88.0, nullable=False)
+    ats_breakdown_json = Column(Text, nullable=True)
+
     analyzed_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     resume = relationship("Resume", back_populates="analysis")

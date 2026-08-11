@@ -48,6 +48,10 @@ def _format_question_response(q: InterviewQuestion) -> InterviewQuestionResponse
                 evaluated_at=ev.evaluated_at
             )
 
+    reasons_list = json.loads(getattr(q, 'reasons_json', None) or "[]")
+    if not reasons_list and q.context_reason:
+        reasons_list = [f"✓ {q.context_reason}"]
+
     return InterviewQuestionResponse(
         id=q.id,
         interview_id=q.interview_id,
@@ -60,9 +64,14 @@ def _format_question_response(q: InterviewQuestion) -> InterviewQuestionResponse
         follow_up_depth=q.follow_up_depth,
         code_starter=q.code_starter,
         code_language=q.code_language,
+        resume_source=getattr(q, 'resume_source', None) or "RESUME",
+        skill=getattr(q, 'skill_name', None),
+        project=getattr(q, 'project_title', None),
+        reasons=reasons_list,
         answer=ans_res,
         evaluation=eval_res
     )
+
 
 def _format_interview_response(interview: Interview) -> InterviewResponse:
     q_list = [_format_question_response(q) for q in interview.questions]

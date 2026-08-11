@@ -63,11 +63,24 @@ export interface ResumeAnalysis {
   education_score: number;
   relevance_score: number;
   completeness_score: number;
+  ats_score?: number;
+  ats_formatting_score?: number;
+  ats_keyword_score?: number;
+  ats_readability_score?: number;
+  ats_breakdown?: {
+    action_verbs_count?: number;
+    found_action_verbs?: string[];
+    quantifiable_metrics_count?: number;
+    parseability_status?: string;
+    contact_info_status?: string;
+    ats_recommendations?: string[];
+  };
   strengths: string[];
   weaknesses: string[];
   missing_info: string[];
   analyzed_at: string;
 }
+
 
 export interface JobDescription {
   id: number;

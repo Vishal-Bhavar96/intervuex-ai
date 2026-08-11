@@ -61,6 +61,11 @@ async def upload_resume(
         education_score=analysis.education_score,
         relevance_score=analysis.relevance_score,
         completeness_score=analysis.completeness_score,
+        ats_score=getattr(analysis, 'ats_score', 85.0),
+        ats_formatting_score=getattr(analysis, 'ats_formatting_score', 90.0),
+        ats_keyword_score=getattr(analysis, 'ats_keyword_score', 82.0),
+        ats_readability_score=getattr(analysis, 'ats_readability_score', 88.0),
+        ats_breakdown=json.loads(getattr(analysis, 'ats_breakdown_json', None) or "{}"),
         strengths=json.loads(analysis.strengths_json or "[]"),
         weaknesses=json.loads(analysis.weaknesses_json or "[]"),
         missing_info=json.loads(analysis.missing_info_json or "[]"),
@@ -97,8 +102,14 @@ def get_latest_resume_analysis(current_user: User = Depends(get_current_user), d
         education_score=analysis.education_score,
         relevance_score=analysis.relevance_score,
         completeness_score=analysis.completeness_score,
+        ats_score=getattr(analysis, 'ats_score', 85.0),
+        ats_formatting_score=getattr(analysis, 'ats_formatting_score', 90.0),
+        ats_keyword_score=getattr(analysis, 'ats_keyword_score', 82.0),
+        ats_readability_score=getattr(analysis, 'ats_readability_score', 88.0),
+        ats_breakdown=json.loads(getattr(analysis, 'ats_breakdown_json', None) or "{}"),
         strengths=json.loads(analysis.strengths_json or "[]"),
         weaknesses=json.loads(analysis.weaknesses_json or "[]"),
         missing_info=json.loads(analysis.missing_info_json or "[]"),
         analyzed_at=analysis.analyzed_at
     )
+

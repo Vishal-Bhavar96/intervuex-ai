@@ -13,11 +13,17 @@ class ResumeAnalysisResponse(BaseModel):
     education_score: float
     relevance_score: float
     completeness_score: float
+    ats_score: float = 85.0
+    ats_formatting_score: float = 90.0
+    ats_keyword_score: float = 82.0
+    ats_readability_score: float = 88.0
+    ats_breakdown: Optional[dict] = None
     strengths: List[str] = []
     weaknesses: List[str] = []
     missing_info: List[str] = []
     analyzed_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 class ResumeUploadResponse(BaseModel):
     id: int
