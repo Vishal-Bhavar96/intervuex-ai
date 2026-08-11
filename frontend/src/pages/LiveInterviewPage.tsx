@@ -3,7 +3,7 @@ import { api } from '../services/api';
 import { Interview, InterviewQuestion, AnswerEvaluation } from '../types';
 import { 
   Bot, Mic, MicOff, Send, Clock, Sparkles, CheckCircle, AlertTriangle, 
-  HelpCircle, ArrowRight, ShieldAlert, Award
+  HelpCircle, ArrowRight, ShieldAlert, Award, Volume2, VolumeX, Play, Pause, Radio
 } from 'lucide-react';
 
 interface LiveInterviewPageProps {
@@ -21,8 +21,76 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
   const [isRecording, setIsRecording] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
 
+  // Interviewer Question Audio Format State
+  const [isAudioSwitchOn, setIsAudioSwitchOn] = useState(true);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
   const recognitionRef = React.useRef<any>(null);
   const baseTextRef = React.useRef<string>('');
+
+  // Speech Synthesis for Interviewer Audio Format
+  const stopAudio = () => {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
+    setIsPlayingAudio(false);
+  };
+
+  const speakQuestion = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    stopAudio();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+    utterance.lang = 'en-US';
+
+    const voices = window.speechSynthesis.getVoices();
+    const selectedVoice = voices.find(v => 
+      v.lang.startsWith('en') && 
+      (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Daniel') || v.name.includes('David'))
+    );
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+
+    utterance.onstart = () => setIsPlayingAudio(true);
+    utterance.onend = () => setIsPlayingAudio(false);
+    utterance.onerror = () => setIsPlayingAudio(false);
+
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error('Speech synthesis error', err);
+      setIsPlayingAudio(false);
+    }
+  };
+
+  const toggleAudioPlayback = () => {
+    if (isPlayingAudio) {
+      stopAudio();
+    } else if (currentQuestion) {
+      speakQuestion(currentQuestion.question_text);
+    }
+  };
+
+  // Auto-read question when main switch is ON or when question changes
+  useEffect(() => {
+    if (currentQuestion && isAudioSwitchOn) {
+      const timer = setTimeout(() => {
+        speakQuestion(currentQuestion.question_text);
+      }, 300);
+      return () => {
+        clearTimeout(timer);
+        stopAudio();
+      };
+    } else {
+      stopAudio();
+    }
+  }, [currentQuestion?.id, isAudioSwitchOn]);
+
 
   // Timer interval
   useEffect(() => {
@@ -126,6 +194,7 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
   const handleSubmitAnswer = async () => {
     if (!currentQuestion || !answerText.trim()) return;
 
+    stopAudio();
     setSubmitting(true);
     try {
       const evalResult = await api.submitAnswer(interviewId, {
@@ -184,23 +253,71 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
         <div>
           {/* Question Box */}
           <div className="card" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #2563EB' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bot size={20} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Bot size={20} />
+                </div>
+                <div>
+                  <strong style={{ color: '#1E3A5F', display: 'block' }}>IntervueX AI Interviewer</strong>
+                  {currentQuestion.follow_up_depth > 0 && (
+                    <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
+                      ADAPTIVE FOLLOW-UP QUESTION
+                    </span>
+                  )}
+                </div>
               </div>
-              <div>
-                <strong style={{ color: '#1E3A5F', display: 'block' }}>IntervueX AI Interviewer</strong>
-                {currentQuestion.follow_up_depth > 0 && (
-                  <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
-                    ADAPTIVE FOLLOW-UP QUESTION
-                  </span>
-                )}
+
+              {/* Main Audio Format Switch */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', background: '#F8FAFC', padding: '0.35rem 0.75rem', borderRadius: '9999px', border: '1px solid #E2E8F0' }}>
+                <span style={{ fontSize: '0.775rem', fontWeight: '700', color: isAudioSwitchOn ? '#2563EB' : '#64748B', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Volume2 size={15} /> Audio Question Switch
+                </span>
+                <label className="switch" title="Toggle automatic audio format reading for interviewer questions">
+                  <input 
+                    type="checkbox" 
+                    checked={isAudioSwitchOn} 
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setIsAudioSwitchOn(checked);
+                      if (!checked) stopAudio();
+                    }} 
+                  />
+                  <span className="slider"></span>
+                </label>
               </div>
             </div>
 
-            <h3 style={{ fontSize: '1.25rem', color: '#111827', lineHeight: '1.4', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: '#111827', lineHeight: '1.4', marginBottom: '0.75rem' }}>
               "{currentQuestion.question_text}"
             </h3>
+
+            {/* Audio Controls & Sound Waveform Indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.85rem', paddingTop: '0.75rem', borderTop: '1px dashed #E2E8F0' }}>
+              <button 
+                type="button"
+                className={`btn btn-sm ${isPlayingAudio ? 'btn-action' : 'btn-outline'}`}
+                onClick={toggleAudioPlayback}
+                style={{ gap: '0.4rem', fontSize: '0.825rem' }}
+              >
+                {isPlayingAudio ? <VolumeX size={15} /> : <Volume2 size={15} />}
+                {isPlayingAudio ? 'Pause Question Audio' : '🔊 Play Question Audio Format'}
+              </button>
+
+              {isPlayingAudio && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#EFF6FF', padding: '0.25rem 0.65rem', borderRadius: '9999px', border: '1px solid #BFDBFE' }}>
+                  <div className="audio-wave">
+                    <div className="audio-bar"></div>
+                    <div className="audio-bar"></div>
+                    <div className="audio-bar"></div>
+                    <div className="audio-bar"></div>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#1D4ED8' }}>
+                    AI Interviewer Speaking...
+                  </span>
+                </div>
+              )}
+            </div>
 
             {currentQuestion.context_reason && (
               <p style={{ fontSize: '0.85rem', color: '#64748B', background: '#F8FAFC', padding: '0.6rem 0.8rem', borderRadius: '6px' }}>
@@ -208,6 +325,7 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
               </p>
             )}
           </div>
+
 
           {/* Candidate Answer Box */}
           <div className="card">
