@@ -122,6 +122,48 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
         <p style={{ color: '#64748B' }}>Customize interview dimensions, question types, focus areas, duration, and feedback preferences.</p>
       </div>
 
+      {/* Featured Project Defense Banner Card */}
+      <div 
+        className="card" 
+        style={{ 
+          marginBottom: '2rem', 
+          background: 'linear-gradient(135deg, #4C1D95 0%, #1E1B4B 100%)', 
+          color: '#FFFFFF', 
+          padding: '1.5rem 2rem', 
+          borderRadius: '16px',
+          border: '1px solid #6D28D9',
+          boxShadow: '0 10px 25px -5px rgba(76, 29, 149, 0.3)'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+              <span className="badge" style={{ background: '#F3E8FF', color: '#6B21A8', fontWeight: '800', fontSize: '0.8rem' }}>
+                ⭐⭐⭐⭐⭐ FEATURED MODE
+              </span>
+              <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#C084FC' }}>
+                FOR FINAL-YEAR STUDENTS & FRESHERS
+              </span>
+            </div>
+            <h3 style={{ color: '#FFFFFF', fontSize: '1.35rem', margin: '0.2rem 0' }}>
+              Project Defense Mode — <span style={{ color: '#E9D5FF' }}>Secure File Sharing System</span>
+            </h3>
+            <p style={{ color: '#DDD6FE', fontSize: '0.875rem', marginTop: '0.2rem' }}>
+              Evaluates 8 core dimensions: Project Understanding • Architecture • Tech Selection • Database Schema • Security • Implementation • Challenges • Scalability
+            </p>
+          </div>
+
+          <button 
+            type="button" 
+            className="btn btn-action"
+            style={{ background: '#FFFFFF', color: '#6B21A8', border: 'none', fontWeight: '800', fontSize: '0.9rem', padding: '0.75rem 1.25rem' }}
+            onClick={() => setInterviewType('PROJECT_DEFENSE')}
+          >
+            Select Project Defense Mode →
+          </button>
+        </div>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', alignItems: 'start' }}>
         
         {/* Left Column: Form Controls */}

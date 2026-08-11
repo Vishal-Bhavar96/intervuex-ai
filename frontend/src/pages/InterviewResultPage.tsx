@@ -49,10 +49,13 @@ export const InterviewResultPage: React.FC<InterviewResultPageProps> = ({ interv
       </div>
 
       {/* Main Score Hero Card */}
-      <div className="card" style={{ background: 'linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 100%)', color: '#FFFFFF', padding: '2.5rem', borderRadius: '16px', marginBottom: '2.5rem' }}>
+      <div className="card" style={{ background: 'linear-gradient(135deg, #1E3A5F 0%, #1D4ED8 100%)', color: '#FFFFFF', padding: '2.5rem', borderRadius: '16px', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <div>
-            <p style={{ color: '#93C5FD', fontWeight: '700', fontSize: '0.85rem' }}>OVERALL INTERVIEW SCORE</p>
+            <span style={{ background: '#EFF6FF', color: '#1D4ED8', padding: '0.35rem 0.8rem', borderRadius: '9999px', fontWeight: '800', fontSize: '0.8rem', letterSpacing: '0.04em' }}>
+              MNC CAMPUS PLACEMENT READINESS REPORT
+            </span>
+            <p style={{ color: '#93C5FD', fontWeight: '700', fontSize: '0.85rem', marginTop: '0.6rem' }}>OVERALL INTERVIEW SCORE</p>
             <h1 style={{ color: '#FFFFFF', fontSize: '4rem', margin: '0.2rem 0', lineHeight: '1' }}>
               {score.overall_score}<span style={{ fontSize: '1.8rem', color: '#94A3B8' }}>/100</span>
             </h1>
@@ -82,6 +85,33 @@ export const InterviewResultPage: React.FC<InterviewResultPageProps> = ({ interv
               <strong>{score.project_knowledge_score}/100</strong>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Project Defense 8-Dimension Evaluation Grid */}
+      <div className="card" style={{ marginBottom: '2rem', border: '1px solid #E2E8F0', borderRadius: '14px' }}>
+        <h3 style={{ marginBottom: '1.25rem', color: '#1E3A5F', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Award size={22} color="#6B21A8" /> Project Defense 8-Dimension Evaluation Breakdown
+        </h3>
+        <div className="grid grid-2 gap-4">
+          {[
+            { title: '1. Project Understanding', status: '✓ Excellent', score: '88/100', desc: 'Clear explanation of core project objective and candidate role.' },
+            { title: '2. System Architecture', status: '✓ Solid', score: '84/100', desc: 'Structured description of software architecture and data flow.' },
+            { title: '3. Technology Selection', status: '✓ Well Justified', score: '85/100', desc: 'Strong engineering rationale for framework & language choice.' },
+            { title: '4. Database Schema', status: '✓ Good', score: '80/100', desc: 'Proper table normalization, foreign keys, and relational queries.' },
+            { title: '5. Security & Encryption', status: '✓ Satisfactory', score: '82/100', desc: 'Authentication, password hashing, and data protection awareness.' },
+            { title: '6. Implementation Depth', status: '✓ Hands-On', score: '86/100', desc: 'Demonstrated direct feature ownership and custom coding.' },
+            { title: '7. Challenges & Debugging', status: '✓ Good Resilience', score: '81/100', desc: 'Logical approach to resolving technical bugs and bottlenecks.' },
+            { title: '8. Future Scope & Scalability', status: '✓ Forward-Looking', score: '83/100', desc: 'Practical awareness of database indexing and user scaling.' }
+          ].map((dim, i) => (
+            <div key={i} style={{ background: '#F8FAFC', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <strong style={{ fontSize: '0.9rem', color: '#1E3A5F' }}>{dim.title}</strong>
+                <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#16A34A' }}>{dim.score}</span>
+              </div>
+              <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0 }}>{dim.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
 

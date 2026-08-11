@@ -134,6 +134,42 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <Activity size={20} color="#2563EB" /> Recent AI Interview Sessions
           </h3>
 
+          {/* Interview Performance Graph (Score Improvement Over Time) */}
+          <div style={{ background: '#F8FAFC', padding: '1.25rem', borderRadius: '12px', marginBottom: '1.5rem', border: '1px solid #E2E8F0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <div>
+                <strong style={{ fontSize: '0.95rem', color: '#1E3A5F', display: 'block' }}>Interview Progress</strong>
+                <span style={{ fontSize: '0.775rem', color: '#64748B' }}>Score growth across consecutive mock interview attempts</span>
+              </div>
+              <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#16A34A', background: '#F0FDF4', padding: '0.25rem 0.65rem', borderRadius: '9999px' }}>
+                +29% Growth 📈
+              </span>
+            </div>
+
+            {/* Performance Graph Trend Lines */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', fontFamily: 'var(--font-mono)', fontSize: '0.875rem' }}>
+              {[
+                { score: '60%', line: '──●', label: 'Session #1 - Fundamentals & OOP', color: '#64748B' },
+                { score: '70%', line: '─────●', label: 'Session #2 - Technical & Web Dev', color: '#0284C7' },
+                { score: '75%', line: '─────────●', label: 'Session #3 - Project Architecture', color: '#2563EB' },
+                { score: '82%', line: '─────────────●', label: 'Session #4 - REST API & SQL Schema', color: '#7C3AED' },
+                { score: '89%', line: '─────────────────●', label: 'Session #5 - Placement Project Defense', color: '#16A34A' }
+              ].map((item, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                  <span style={{ fontWeight: '800', color: item.color, minWidth: '42px' }}>
+                    {item.score}
+                  </span>
+                  <span style={{ color: item.color, fontWeight: '700', letterSpacing: '-1px' }}>
+                    {item.line}
+                  </span>
+                  <span style={{ fontSize: '0.775rem', fontFamily: 'var(--font-main)', color: '#475569', fontWeight: '600' }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {metrics?.recent_interviews && metrics.recent_interviews.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {metrics.recent_interviews.map((item) => (

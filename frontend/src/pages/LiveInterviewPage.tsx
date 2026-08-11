@@ -397,58 +397,42 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
           </div>
         </div>
 
-        {/* Right Column: Real-Time Feedback or Expected Topics */}
+        {/* Right Column: AI Interviewer Persona & Exam Simulation Protocol */}
         <div>
-          {lastEval && interview.instant_feedback_enabled ? (
-            <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-              <h4 style={{ color: '#16A34A', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                <Award size={20} /> Real-Time Evaluation Feedback
-              </h4>
-
-              <div style={{ background: '#FFFFFF', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.25rem', fontWeight: '800', color: '#16A34A', marginBottom: '0.5rem' }}>
-                  <span>Overall Answer Score:</span>
-                  <span>{lastEval.overall_score}/100</span>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#64748B', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem' }}>
-                  <div>Technical: {lastEval.technical_score}</div>
-                  <div>Relevance: {lastEval.relevance_score}</div>
-                  <div>Completeness: {lastEval.completeness_score}</div>
-                  <div>Communication: {lastEval.communication_score}</div>
-                </div>
+          <div className="card" style={{ borderLeft: '4px solid #1E3A5F' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1rem' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#F1F5F9', color: '#1E3A5F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot size={20} />
               </div>
+              <div>
+                <strong style={{ color: '#1E3A5F', display: 'block', fontSize: '0.95rem' }}>AI Interviewer Persona</strong>
+                <span style={{ fontSize: '0.75rem', color: '#16A34A', fontWeight: '700' }}>
+                  🟢 Active Company Interview Simulation
+                </span>
+              </div>
+            </div>
 
-              <strong style={{ color: '#16A34A', fontSize: '0.85rem' }}>✓ Key Strengths:</strong>
-              <ul style={{ paddingLeft: '1.2rem', fontSize: '0.85rem', marginBottom: '1rem', color: '#15803D' }}>
-                {lastEval.strengths.map((s, i) => <li key={i}>{s}</li>)}
+            <div style={{ background: '#F8FAFC', padding: '1rem', borderRadius: '10px', marginBottom: '1.25rem', border: '1px solid #E2E8F0' }}>
+              <strong style={{ fontSize: '0.85rem', color: '#1E3A5F', display: 'block', marginBottom: '0.4rem' }}>
+                📋 Interview Protocol:
+              </strong>
+              <ul style={{ paddingLeft: '1.2rem', fontSize: '0.825rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '0.3rem', margin: 0 }}>
+                <li><strong>No Mid-Interview Hints:</strong> Evaluates responses silently like a corporate technical interviewer.</li>
+                <li><strong>No Intermediate Feedback:</strong> Avoids revealing scores or expected concepts during live questioning.</li>
+                <li><strong>Adaptive Questioning:</strong> AI listens to answers and selects relevant follow-up questions.</li>
+                <li><strong>Final Evaluation Report:</strong> Multi-dimensional scores, strengths, and roadmap generated upon completion.</li>
               </ul>
+            </div>
 
-              {lastEval.weaknesses.length > 0 && (
-                <>
-                  <strong style={{ color: '#D97706', fontSize: '0.85rem' }}>⚠ Areas to Improve:</strong>
-                  <ul style={{ paddingLeft: '1.2rem', fontSize: '0.85rem', color: '#B45309' }}>
-                    {lastEval.weaknesses.map((w, i) => <li key={i}>{w}</li>)}
-                  </ul>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="card">
-              <h4 style={{ marginBottom: '1rem', color: '#1E3A5F' }}>Interview Context</h4>
-              <p style={{ fontSize: '0.875rem', color: '#64748B', marginBottom: '1rem' }}>
-                The AI interviewer generates dynamic follow-up questions tailored to your previous answer's technical accuracy.
-              </p>
-              <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: '8px' }}>
-                <strong style={{ fontSize: '0.85rem', color: '#1E3A5F' }}>Expected Assessment Dimensions:</strong>
-                <ul style={{ paddingLeft: '1.2rem', fontSize: '0.825rem', marginTop: '0.5rem', color: '#475569' }}>
-                  <li>Technical Accuracy & Rationale</li>
-                  <li>Relevance to Target Role</li>
-                  <li>Completeness & Edge Cases</li>
-                  <li>Structured Communication</li>
-                </ul>
+            <div style={{ background: '#EFF6FF', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #BFDBFE' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#1D4ED8', marginBottom: '0.25rem' }}>
+                🎯 Candidate Tip:
               </div>
+              <p style={{ fontSize: '0.825rem', color: '#1E40AF', margin: 0 }}>
+                Speak or type clearly. Provide technical rationale, schema details, and project roles in a structured manner.
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
       </div>
