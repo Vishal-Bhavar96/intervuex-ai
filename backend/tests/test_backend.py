@@ -115,3 +115,74 @@ def test_interview_flow():
     assert res_ans.status_code == 200
     eval_data = res_ans.json()
     assert eval_data["overall_score"] > 0.0
+
+def test_aptitude_assessment_flow():
+    # 1. Register candidate
+    reg_payload = {
+        "email": "aptitude_candidate@intervuex.com",
+        "password": "Password123!",
+        "full_name": "Aptitude Tester"
+    }
+    res = client.post("/api/v1/auth/register", json=reg_payload)
+    assert res.status_code == 201
+    token = res.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Seed demo questions in in-memory test DB
+    from app.core.seed import seed_demo_data
+    db = TestingSessionLocal()
+    try:
+        seed_demo_data(db)
+    finally:
+        db.close()
+
+    # 2. Start Aptitude Test
+    start_payload = {
+        "company_pattern": "TCS-style",
+        "difficulty_mode": "Mixed",
+        "total_questions": 40,
+        "duration_minutes": 45
+    }
+    res_start = client.post("/api/v1/aptitude/tests/start", json=start_payload, headers=headers)
+    assert res_start.status_code == 200
+    attempt_data = res_start.json()
+    attempt_id = attempt_data["attempt_id"]
+    assert attempt_data["status"] == "IN_PROGRESS"
+    assert len(attempt_data["questions"]) > 0
+
+    first_q = attempt_data["questions"][0]
+
+    # 3. Save Candidate Answer
+    ans_payload = {
+        "question_id": first_q["id"],
+        "selected_option": 1,
+        "is_marked_for_review": False,
+        "time_spent_seconds": 30
+    }
+    res_save = client.post(f"/api/v1/aptitude/attempts/{attempt_id}/answer", json=ans_payload, headers=headers)
+    assert res_save.status_code == 200
+    assert res_save.json()["status"] == "success"
+
+    # 4. Record Monitoring Event
+    evt_payload = {
+        "attempt_id": attempt_id,
+        "event_type": "TAB_SWITCH",
+        "metadata": {"reason": "User switched window"}
+    }
+    res_evt = client.post("/api/v1/aptitude/monitoring-event", json=evt_payload, headers=headers)
+    assert res_evt.status_code == 200
+    assert res_evt.json()["status"] == "recorded"
+
+    # 5. Submit Assessment
+    res_sub = client.post(f"/api/v1/aptitude/attempts/{attempt_id}/submit", json={"answers": []}, headers=headers)
+    assert res_sub.status_code == 200
+    result_data = res_sub.json()
+    assert result_data["status"] == "SUBMITTED"
+    assert result_data["total_score"] >= 0.0
+    assert len(result_data["section_performances"]) > 0
+
+    # 6. Get History
+    res_hist = client.get("/api/v1/aptitude/history", headers=headers)
+    assert res_hist.status_code == 200
+    assert len(res_hist.json()) == 1
+
