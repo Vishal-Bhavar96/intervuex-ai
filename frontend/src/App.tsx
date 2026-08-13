@@ -17,11 +17,27 @@ import { RoadmapPage } from './pages/RoadmapPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { AdminPage } from './pages/AdminPage';
 
+// Aptitude Assessment Imports
+import { AptitudeLandingPage } from './pages/AptitudeLandingPage';
+import { AptitudeSecurityCheckPage } from './pages/AptitudeSecurityCheckPage';
+import { AptitudeTestPage } from './pages/AptitudeTestPage';
+import { AptitudeResultPage } from './pages/AptitudeResultPage';
+import { AptitudeHistoryPage } from './pages/AptitudeHistoryPage';
+import { api } from './services/api';
+import { AptitudeAttemptState, AptitudeResult } from './types/aptitude';
+
 const MainContent: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>(user ? 'dashboard' : 'landing');
   const [activeInterviewId, setActiveInterviewId] = useState<number | null>(null);
   const [activeJobId, setActiveJobId] = useState<number | undefined>(undefined);
+
+  // Aptitude State
+  const [aptitudeCompanyPattern, setAptitudeCompanyPattern] = useState<string>('General MNC');
+  const [aptitudeDifficultyMode, setAptitudeDifficultyMode] = useState<string>('Mixed');
+  const [aptitudeAttemptState, setAptitudeAttemptState] = useState<AptitudeAttemptState | null>(null);
+  const [aptitudeResult, setAptitudeResult] = useState<AptitudeResult | null>(null);
+  const [aptitudeMediaStream, setAptitudeMediaStream] = useState<MediaStream | null>(null);
 
   const handleStartInterviewWithJob = (jobId: number) => {
     setActiveJobId(jobId);
@@ -38,9 +54,55 @@ const MainContent: React.FC = () => {
     setActiveTab('result');
   };
 
+  // Aptitude Handlers
+  const handleStartConfiguredAptitudeTest = (companyPattern: string, difficultyMode: string) => {
+    setAptitudeCompanyPattern(companyPattern);
+    setAptitudeDifficultyMode(difficultyMode);
+    setActiveTab('aptitude_security');
+  };
+
+  const handleProceedToAptitudeTest = async (stream: MediaStream | null) => {
+    setAptitudeMediaStream(stream);
+    try {
+      const state = await api.startAptitudeTest({
+        company_pattern: aptitudeCompanyPattern,
+        difficulty_mode: aptitudeDifficultyMode,
+        total_questions: 40,
+        duration_minutes: 45
+      });
+      setAptitudeAttemptState(state);
+      setActiveTab('aptitude_test');
+    } catch (e) {
+      alert('Failed to start Aptitude Test. Please try again.');
+    }
+  };
+
+  const handleAptitudeTestCompleted = async (attemptId: number) => {
+    try {
+      const res = await api.getAptitudeResult(attemptId);
+      setAptitudeResult(res);
+      setActiveTab('aptitude_result');
+    } catch (e) {
+      alert('Failed to load assessment result.');
+    }
+  };
+
+  const handleViewAptitudeHistoryResult = async (attemptId: number) => {
+    try {
+      const res = await api.getAptitudeResult(attemptId);
+      setAptitudeResult(res);
+      setActiveTab('aptitude_result');
+    } catch (e) {
+      alert('Failed to load result details.');
+    }
+  };
+
+  // Suppress top navbar during focused examination
+  const isAssessmentTakingMode = activeTab === 'aptitude_test';
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {!isAssessmentTakingMode && <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />}
 
       <main style={{ flex: 1 }}>
         {activeTab === 'landing' && <LandingPage onStart={() => setActiveTab(user ? 'dashboard' : 'login')} />}
@@ -70,18 +132,56 @@ const MainContent: React.FC = () => {
             {activeTab === 'roadmap' && <RoadmapPage />}
             {activeTab === 'history' && <HistoryPage onNavigateToResult={(id) => { setActiveInterviewId(id); setActiveTab('result'); }} />}
             {activeTab === 'admin' && <AdminPage />}
+
+            {/* APTITUDE ASSESSMENT MODULE ROUTES */}
+            {activeTab === 'aptitude' && (
+              <AptitudeLandingPage
+                onStartConfiguredTest={handleStartConfiguredAptitudeTest}
+                onViewHistory={() => setActiveTab('aptitude_history')}
+              />
+            )}
+            {activeTab === 'aptitude_security' && (
+              <AptitudeSecurityCheckPage
+                companyPattern={aptitudeCompanyPattern}
+                difficultyMode={aptitudeDifficultyMode}
+                onProceedToTest={handleProceedToAptitudeTest}
+                onCancel={() => setActiveTab('aptitude')}
+              />
+            )}
+            {activeTab === 'aptitude_test' && aptitudeAttemptState && (
+              <AptitudeTestPage
+                attemptState={aptitudeAttemptState}
+                mediaStream={aptitudeMediaStream}
+                onComplete={handleAptitudeTestCompleted}
+              />
+            )}
+            {activeTab === 'aptitude_result' && aptitudeResult && (
+              <AptitudeResultPage
+                result={aptitudeResult}
+                onRetake={() => setActiveTab('aptitude')}
+                onBackToDashboard={() => setActiveTab('dashboard')}
+              />
+            )}
+            {activeTab === 'aptitude_history' && (
+              <AptitudeHistoryPage
+                onViewResult={handleViewAptitudeHistoryResult}
+                onStartNewTest={() => setActiveTab('aptitude')}
+              />
+            )}
           </>
         )}
       </main>
 
-      {/* Corporate Footer */}
-      <footer style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0', padding: '1.75rem 0', marginTop: 'auto', textAlign: 'center' }}>
-        <div className="container">
-          <p style={{ color: '#64748B', fontSize: '0.875rem' }}>
-            IntervueX © 2026. Adaptive AI Interview & Career Readiness SaaS Platform. All Rights Reserved.
-          </p>
-        </div>
-      </footer>
+      {/* Corporate Footer (Hidden during focused examination mode) */}
+      {!isAssessmentTakingMode && (
+        <footer style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0', padding: '1.75rem 0', marginTop: 'auto', textAlign: 'center' }}>
+          <div className="container">
+            <p style={{ color: '#64748B', fontSize: '0.875rem' }}>
+              IntervueX © 2026. Adaptive AI Interview & Career Readiness SaaS Platform. All Rights Reserved.
+            </p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 };

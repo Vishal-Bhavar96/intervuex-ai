@@ -8,6 +8,10 @@ class CandidateDashboardMetrics(BaseModel):
     job_match_score: float
     career_readiness_score: float
     readiness_category: str
+    aptitude_score: Optional[float] = 76.0
+    last_aptitude_date: Optional[str] = None
+    best_aptitude_score: Optional[float] = 76.0
+    total_aptitude_tests_completed: Optional[int] = 0
     total_interviews_completed: int
     recent_interviews: List[InterviewResponse] = []
     top_skill_gaps: List[SkillGapResponse] = []

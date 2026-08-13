@@ -16,6 +16,7 @@ from app.api.v1.interview import router as interview_router
 from app.api.v1.coding import router as coding_router
 from app.api.v1.analytics import router as analytics_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.aptitude import router as aptitude_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("intervuex")
@@ -59,6 +60,7 @@ app.include_router(interview_router, prefix=api_v1_prefix)
 app.include_router(coding_router, prefix=api_v1_prefix)
 app.include_router(analytics_router, prefix=api_v1_prefix)
 app.include_router(admin_router, prefix=api_v1_prefix)
+app.include_router(aptitude_router, prefix=api_v1_prefix)
 
 @app.get("/")
 def root():

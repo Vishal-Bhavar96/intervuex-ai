@@ -33,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   }, []);
 
   const isCareerActive = ['resume', 'job', 'roadmap'].includes(activeTab);
-  const isPracticeActive = ['setup', 'live', 'coding'].includes(activeTab);
+  const isPracticeActive = ['setup', 'live', 'coding', 'aptitude', 'aptitude_landing', 'aptitude_test', 'aptitude_result', 'aptitude_history'].includes(activeTab);
 
   return (
     <header style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -145,8 +145,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 <div style={{
                   position: 'absolute', top: '110%', left: 0, background: '#FFFFFF', border: '1px solid #E2E8F0',
                   borderRadius: '10px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', padding: '0.5rem',
-                  minWidth: '180px', display: 'flex', flexDirection: 'column', gap: '0.25rem', zIndex: 110
+                  minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.25rem', zIndex: 110
                 }}>
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? '#F1F5F9' : 'transparent', fontWeight: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? '700' : '500' }}
+                    onClick={() => { setActiveTab('aptitude'); setPracticeOpen(false); }}
+                  >
+                    <BarChart2 size={15} color="#059669" /> Aptitude Test
+                  </button>
                   <button 
                     className="btn btn-outline" 
                     style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'setup' || activeTab === 'live' ? '#F1F5F9' : 'transparent', fontWeight: activeTab === 'setup' || activeTab === 'live' ? '700' : '500' }}

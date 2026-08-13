@@ -6,6 +6,13 @@ from app.models.job import JobDescription, JobMatchScore
 from app.models.interview import Interview, InterviewQuestion, InterviewAnswer
 from app.models.evaluation import AnswerEvaluation, InterviewScore
 from app.models.roadmap import SkillGap, PreparationPlan, PreparationTask
+from app.models.aptitude import (
+    AptitudeQuestion,
+    AptitudeTestConfig,
+    AptitudeTestAttempt,
+    AptitudeCandidateAnswer,
+    AptitudeMonitoringEvent
+)
 
 __all__ = [
     "Base",
@@ -27,5 +34,11 @@ __all__ = [
     "InterviewScore",
     "SkillGap",
     "PreparationPlan",
-    "PreparationTask"
+    "PreparationTask",
+    "AptitudeQuestion",
+    "AptitudeTestConfig",
+    "AptitudeTestAttempt",
+    "AptitudeCandidateAnswer",
+    "AptitudeMonitoringEvent"
 ]
+

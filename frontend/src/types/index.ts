@@ -3,7 +3,7 @@ export interface User {
   email: string;
   full_name: string;
   role: 'CANDIDATE' | 'ADMIN';
-  is_active: bool;
+  is_active: boolean;
   created_at: string;
 }
 
@@ -135,6 +135,8 @@ export interface InterviewQuestion {
   follow_up_depth: number;
   code_starter?: string;
   code_language?: string;
+  resume_source?: string;
+  reasons?: string[];
   answer?: {
     question_id: number;
     answer_text: string;
@@ -208,6 +210,10 @@ export interface DashboardMetrics {
   job_match_score: number;
   career_readiness_score: number;
   readiness_category: string;
+  aptitude_score?: number;
+  last_aptitude_date?: string;
+  best_aptitude_score?: number;
+  total_aptitude_tests_completed?: number;
   total_interviews_completed: number;
   recent_interviews: Interview[];
   top_skill_gaps: SkillGap[];

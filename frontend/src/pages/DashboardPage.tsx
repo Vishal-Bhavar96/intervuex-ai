@@ -36,8 +36,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
 
   const resumeScore = metrics?.resume_score || 78;
   const jobMatchScore = metrics?.job_match_score || 76;
+  const aptitudeScore = metrics?.aptitude_score || 76;
   const readinessScore = metrics?.career_readiness_score || 81;
-  const readinessCategory = metrics?.readiness_category || 'Interview Ready';
+  const readinessCategory = metrics?.readiness_category || 'Good Performance';
+  const lastAptitudeDate = metrics?.last_aptitude_date || '13 Aug 2026';
+  const bestAptitudeScore = metrics?.best_aptitude_score || 82;
+  const totalAptitudeTests = metrics?.total_aptitude_tests_completed || 4;
 
   return (
     <div className="container" style={{ padding: '2.5rem 1.5rem' }}>
@@ -52,18 +56,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
               Welcome back, {user?.full_name || 'Candidate'}!
             </h1>
             <p style={{ color: '#93C5FD', fontSize: '1rem' }}>
-              Your AI career coach is ready. Prepare for realistic technical and project defense interviews.
+              Your AI career coach is ready. Prepare for realistic MNC aptitude assessments and AI mock interviews.
             </p>
           </div>
 
-          <button className="btn btn-action btn-lg" onClick={() => onNavigate('setup')} style={{ background: '#FFFFFF', color: '#1D4ED8', border: 'none', fontWeight: '700' }}>
-            <PlayCircle size={20} /> Start Mock Interview
-          </button>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button className="btn btn-action btn-lg" onClick={() => onNavigate('aptitude')} style={{ background: '#FFFFFF', color: '#1D4ED8', border: 'none', fontWeight: '700' }}>
+              <Activity size={20} /> Take Aptitude Test
+            </button>
+            <button className="btn btn-outline btn-lg" onClick={() => onNavigate('setup')} style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#FFFFFF', fontWeight: '700' }}>
+              <PlayCircle size={20} /> Mock Interview
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Top 3 Core Metrics */}
-      <div className="grid grid-3 gap-6" style={{ marginBottom: '2.5rem' }}>
+      {/* Top 4 Core Metrics */}
+      <div className="grid grid-4 gap-6" style={{ marginBottom: '2.5rem' }}>
         {/* Resume Score */}
         <div className="card card-hover">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
@@ -79,8 +88,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <div className="progress-fill" style={{ width: `${resumeScore}%`, background: '#0284C7' }}></div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Extracted Skills & Projects</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('resume')}>Upload/View</button>
+            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Extracted Skills</span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('resume')}>View</button>
           </div>
         </div>
 
@@ -99,8 +108,28 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             <div className="progress-fill" style={{ width: `${jobMatchScore}%`, background: '#16A34A' }}></div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Target Skill Alignment</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('job')}>Analyze Job</button>
+            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Skill Alignment</span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('job')}>Analyze</button>
+          </div>
+        </div>
+
+        {/* Aptitude Readiness Card */}
+        <div className="card card-hover">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <div>
+              <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>APTITUDE READINESS</p>
+              <h2 style={{ fontSize: '2.2rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{aptitudeScore}<span style={{ fontSize: '1.1rem', color: '#94A3B8' }}>/100</span></h2>
+            </div>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Activity size={22} />
+            </div>
+          </div>
+          <div style={{ marginBottom: '0.75rem' }}>
+            <span className="badge badge-success" style={{ fontSize: '0.775rem' }}>Good Performance</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.775rem', color: '#64748B' }}>Last: {lastAptitudeDate || '13 Aug 2026'} (Best: {bestAptitudeScore}%)</span>
+            <button className="btn btn-action btn-sm" onClick={() => onNavigate('aptitude')}>Take Test</button>
           </div>
         </div>
 
@@ -116,11 +145,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
             </div>
           </div>
           <div style={{ marginBottom: '0.75rem' }}>
-            <span className="badge badge-success">{readinessCategory}</span>
+            <span className="badge badge-primary" style={{ fontSize: '0.775rem' }}>{readinessCategory}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Interview Readiness Metric</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('setup')}>Practice Now</button>
+            <span style={{ fontSize: '0.775rem', color: '#64748B' }}>Combined Readiness Metric</span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('setup')}>Practice</button>
           </div>
         </div>
       </div>

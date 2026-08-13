@@ -99,4 +99,30 @@ export const api = {
   toggleUserStatus: (userId: number, active: boolean) =>
     request<any>(`/admin/users/${userId}/status?active=${active}`, { method: 'PUT' }),
   getAuditLogs: () => request<any>('/admin/audit-logs'),
+
+  // Aptitude Assessment & Proctoring
+  startAptitudeTest: (data: { company_pattern?: string; difficulty_mode?: string; total_questions?: number; duration_minutes?: number }) =>
+    request<any>('/aptitude/tests/start', { method: 'POST', body: JSON.stringify(data) }),
+  getAptitudeAttemptState: (attemptId: number) =>
+    request<any>(`/aptitude/attempts/${attemptId}`),
+  saveAptitudeAnswer: (attemptId: number, data: { question_id: number; selected_option?: number | null; is_marked_for_review?: boolean; time_spent_seconds?: number }) =>
+    request<any>(`/aptitude/attempts/${attemptId}/answer`, { method: 'POST', body: JSON.stringify(data) }),
+  submitAptitudeAttempt: (attemptId: number, data?: any) =>
+    request<any>(`/aptitude/attempts/${attemptId}/submit`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  getAptitudeResult: (attemptId: number) =>
+    request<any>(`/aptitude/results/${attemptId}`),
+  getAptitudeHistory: () =>
+    request<any>('/aptitude/history'),
+  getAptitudeRecommendations: () =>
+    request<any>('/aptitude/recommendations'),
+  recordAptitudeMonitoringEvent: (data: { attempt_id: number; event_type: string; metadata?: any }) =>
+    request<any>('/aptitude/monitoring-event', { method: 'POST', body: JSON.stringify(data) }),
+  
+  // Admin Aptitude
+  getAdminAptitudeQuestions: () =>
+    request<any>('/aptitude/admin/questions'),
+  createAdminAptitudeQuestion: (data: any) =>
+    request<any>('/aptitude/admin/questions', { method: 'POST', body: JSON.stringify(data) }),
+  deleteAdminAptitudeQuestion: (questionId: number) =>
+    request<any>(`/aptitude/admin/questions/${questionId}`, { method: 'DELETE' }),
 };

@@ -124,7 +124,7 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
       }
       // Get latest unanswered or current question
       const qList = data.questions || [];
-      const current = qList.find(q => !q.answer) || qList[qList.length - 1];
+      const current = qList.find((q: any) => !q.answer) || qList[qList.length - 1];
       setCurrentQuestion(current || null);
     } catch (e) {
       console.error(e);
