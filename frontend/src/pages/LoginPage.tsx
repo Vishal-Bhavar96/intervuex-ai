@@ -59,6 +59,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onSwitchToRegis
     if (!password) {
       setPasswordError('Please enter your password.');
       isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters.');
+      isValid = false;
     }
 
     return isValid;
@@ -85,14 +88,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onSwitchToRegis
         return;
       }
 
-      // Check specific error messages without leaking credential existence
       const message = err.message || '';
       
       if (message.toLowerCase().includes('disabled') || message.toLowerCase().includes('not verified')) {
-        setError('Account not verified or disabled. Please check your email for the verification link or contact administrator.');
+        setError('Account is disabled or not verified. Please contact administrator.');
       } else {
-        // Safe generic message for invalid email or password
-        setError('Invalid email or password. Please check your credentials and try again.');
+        // Clear explicit error message for incorrect credentials or invalid user
+        setError('Incorrect password or invalid email address. Please check your credentials and try again.');
       }
     } finally {
       setLoading(false);

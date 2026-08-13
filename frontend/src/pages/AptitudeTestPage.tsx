@@ -14,7 +14,7 @@ interface AptitudeTestPageProps {
 
 export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
   attemptState: initialAttempt,
-  mediaStream,
+  mediaStream: propsMediaStream,
   onComplete,
 }) => {
   const [attempt, setAttempt] = useState<AptitudeAttemptState>(initialAttempt);
@@ -26,26 +26,53 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
   const [showSubmitModal, setShowSubmitModal] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
-  // Monitoring Events State
+  // Monitoring Events State & Live Stream State
+  const [activeStream, setActiveStream] = useState<MediaStream | null>(propsMediaStream);
   const [monitoringCount, setMonitoringCount] = useState<number>(0);
   const [latestEventMsg, setLatestEventMsg] = useState<string | null>(null);
-  const [cameraConnected, setCameraConnected] = useState<boolean>(!!mediaStream);
+  const [cameraConnected, setCameraConnected] = useState<boolean>(false);
 
   const miniVideoRef = useRef<HTMLVideoElement>(null);
   const timerIntervalRef = useRef<any>(null);
   const questionStartTimeRef = useRef<number>(Date.now());
+  const prevFrameDataRef = useRef<Uint8ClampedArray | null>(null);
 
-  // Attach camera stream to mini preview box
+  // Initialize or fallback camera stream if missing
   useEffect(() => {
-    if (mediaStream && miniVideoRef.current) {
-      miniVideoRef.current.srcObject = mediaStream;
+    let unmounted = false;
+    async function ensureCamera() {
+      if (activeStream && activeStream.active && activeStream.getVideoTracks().length > 0) {
+        setCameraConnected(true);
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 400 }, height: { ideal: 300 } },
+          audio: false
+        });
+        if (!unmounted) {
+          setActiveStream(stream);
+          setCameraConnected(true);
+        }
+      } catch (err) {
+        console.error('Camera fallback initialization error:', err);
+        setCameraConnected(false);
+      }
     }
-  }, [mediaStream]);
+    ensureCamera();
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 
-  // Monitor Camera Disconnection
+  // Attach and play activeStream on miniVideoRef
   useEffect(() => {
-    if (mediaStream) {
-      const videoTrack = mediaStream.getVideoTracks()[0];
+    if (activeStream && miniVideoRef.current) {
+      miniVideoRef.current.srcObject = activeStream;
+      miniVideoRef.current.play().catch(() => {});
+      setCameraConnected(true);
+
+      const videoTrack = activeStream.getVideoTracks()[0];
       if (videoTrack) {
         videoTrack.onended = () => {
           setCameraConnected(false);
@@ -53,7 +80,7 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
         };
       }
     }
-  }, [mediaStream]);
+  }, [activeStream]);
 
   // Initialize answer state map from attempt response
   useEffect(() => {
@@ -71,8 +98,17 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
   // Record Proctoring Events
   const handleRecordEvent = async (eventType: string, metadata?: any) => {
     setMonitoringCount((prev) => prev + 1);
-    setLatestEventMsg(`Assessment monitoring event detected (${eventType.replace('_', ' ')})`);
-    setTimeout(() => setLatestEventMsg(null), 5000);
+    
+    let userFriendlyMsg = `Assessment monitoring alert: ${eventType.replace(/_/g, ' ')}`;
+    if (eventType === 'COPY_ATTEMPT' || eventType === 'PASTE_ATTEMPT') {
+      userFriendlyMsg = '⚠️ PROCTORING ALERT: Copying text or using mobile phone search is strictly prohibited!';
+    } else if (eventType === 'HEAD_MOVEMENT_LOOKAWAY') {
+      userFriendlyMsg = '⚠️ PROCTORING ALERT: Head movement or looking away detected! Please stay focused on the screen.';
+    } else if (eventType === 'TAB_SWITCH' || eventType === 'WINDOW_BLUR') {
+      userFriendlyMsg = '⚠️ PROCTORING ALERT: Tab switch or window blur detected!';
+    }
+
+    setLatestEventMsg(userFriendlyMsg);
 
     try {
       await api.recordAptitudeMonitoringEvent({
@@ -85,7 +121,7 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
     }
   };
 
-  // Setup Proctoring Listeners: Tab Switch & Visibility Change
+  // Setup Anti-Cheating Listeners: Copy/Paste, Context Menu, Shortcuts & Window Blur
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -96,14 +132,95 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
       handleRecordEvent('WINDOW_BLUR', { timestamp: new Date().toISOString() });
     };
 
+    const handleCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+      handleRecordEvent('COPY_ATTEMPT', { timestamp: new Date().toISOString() });
+    };
+
+    const handleCut = (e: ClipboardEvent) => {
+      e.preventDefault();
+      handleRecordEvent('COPY_ATTEMPT', { type: 'cut', timestamp: new Date().toISOString() });
+    };
+
+    const handlePaste = (e: ClipboardEvent) => {
+      e.preventDefault();
+      handleRecordEvent('PASTE_ATTEMPT', { timestamp: new Date().toISOString() });
+    };
+
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      handleRecordEvent('COPY_ATTEMPT', { type: 'contextmenu', timestamp: new Date().toISOString() });
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+U, F12, Alt+Tab
+      if (
+        (e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'u', 'a'].includes(e.key.toLowerCase()) ||
+        e.key === 'F12' || e.key === 'PrintScreen'
+      ) {
+        e.preventDefault();
+        handleRecordEvent('COPY_ATTEMPT', { key: e.key, timestamp: new Date().toISOString() });
+      }
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleBlur);
+    document.addEventListener('copy', handleCopy);
+    document.addEventListener('cut', handleCut);
+    document.addEventListener('paste', handlePaste);
+    document.addEventListener('contextmenu', handleContextMenu);
+    window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('copy', handleCopy);
+      document.removeEventListener('cut', handleCut);
+      document.removeEventListener('paste', handlePaste);
+      document.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [attempt.attempt_id]);
+
+  // Motion & Head Direction Sampling via Video Canvas
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 80;
+    canvas.height = 60;
+    const ctx = canvas.getContext('2d');
+
+    const motionInterval = setInterval(() => {
+      if (!miniVideoRef.current || !ctx || !cameraConnected) return;
+      try {
+        ctx.drawImage(miniVideoRef.current, 0, 0, 80, 60);
+        const frame = ctx.getImageData(0, 0, 80, 60);
+        const data = frame.data;
+
+        if (prevFrameDataRef.current) {
+          let diffSum = 0;
+          const prev = prevFrameDataRef.current;
+          for (let i = 0; i < data.length; i += 8) { // sample every 2nd pixel
+            const diffR = Math.abs(data[i] - prev[i]);
+            const diffG = Math.abs(data[i+1] - prev[i+1]);
+            const diffB = Math.abs(data[i+2] - prev[i+2]);
+            diffSum += (diffR + diffG + diffB) / 3;
+          }
+          const avgDiff = diffSum / (data.length / 8);
+          // If significant sudden movement / turning head away / holding up mobile
+          if (avgDiff > 28) {
+            handleRecordEvent('HEAD_MOVEMENT_LOOKAWAY', { avgDiff: Math.round(avgDiff) });
+          }
+        }
+        prevFrameDataRef.current = new Uint8ClampedArray(data);
+      } catch (err) {
+        // canvas CORS/read error fallback
+      }
+    }, 1500);
+
+    return () => {
+      clearInterval(motionInterval);
+    };
+  }, [cameraConnected, attempt.attempt_id]);
 
   // Countdown Timer & Auto-Submit on Expiration
   useEffect(() => {
@@ -271,10 +388,33 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
         </div>
       )}
 
-      {/* PROCTORING EVENT DISCREPANCY BANNER */}
+      {/* PROCTORING EVENT WARNING ALERT BANNER */}
       {latestEventMsg && (
-        <div style={{ background: '#FFFBEB', borderBottom: '1px solid #FDE68A', color: '#B45309', padding: '0.5rem 1.5rem', fontSize: '0.85rem', fontWeight: '700', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-          <ShieldAlert size={16} /> {latestEventMsg} (Events Recorded: {monitoringCount})
+        <div style={{
+          background: '#FEF2F2',
+          borderBottom: '2px solid #FCA5A5',
+          color: '#B91C1C',
+          padding: '0.65rem 1.5rem',
+          fontSize: '0.875rem',
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          justify: 'space-between',
+          animation: 'fadeIn 0.2s ease-in-out'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <ShieldAlert size={18} color="#DC2626" />
+            <span>{latestEventMsg}</span>
+            <span className="badge badge-danger" style={{ fontSize: '0.75rem', marginLeft: '0.5rem' }}>
+              Incidents Logged: {monitoringCount}
+            </span>
+          </div>
+          <button
+            onClick={() => setLatestEventMsg(null)}
+            style={{ background: 'none', border: 'none', color: '#991B1B', fontWeight: '800', cursor: 'pointer', fontSize: '0.8rem' }}
+          >
+            ✕ Dismiss
+          </button>
         </div>
       )}
 
@@ -388,7 +528,16 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
           
           {/* Proctored Mini Camera Overlay */}
           <div className="card" style={{ padding: '0.75rem', borderRadius: '12px' }}>
-            <div style={{ background: '#0F172A', borderRadius: '8px', overflow: 'hidden', height: '140px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1E3A5F', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Camera size={14} color="#2563EB" /> LIVE PROCTORED FEED
+              </span>
+              <span className={`badge ${monitoringCount > 0 ? 'badge-warning' : 'badge-primary'}`} style={{ fontSize: '0.7rem' }}>
+                Violations: {monitoringCount}
+              </span>
+            </div>
+
+            <div style={{ background: '#0F172A', borderRadius: '8px', overflow: 'hidden', height: '160px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <video 
                 ref={miniVideoRef} 
                 autoPlay 
@@ -396,8 +545,9 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
                 muted 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
-              <div style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(15, 23, 42, 0.8)', color: cameraConnected ? '#10B981' : '#EF4444', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <Camera size={10} /> {cameraConnected ? 'Proctored' : 'Cam Offline'}
+              <div style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(15, 23, 42, 0.85)', color: cameraConnected ? '#10B981' : '#F59E0B', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: cameraConnected ? '#10B981' : '#F59E0B' }}></span>
+                {cameraConnected ? 'Proctored Active' : 'Connecting Camera...'}
               </div>
             </div>
           </div>

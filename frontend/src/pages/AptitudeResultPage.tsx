@@ -55,10 +55,13 @@ export const AptitudeResultPage: React.FC<AptitudeResultPageProps> = ({
           {/* Big Aptitude Score Card */}
           <div style={{ background: 'rgba(255, 255, 255, 0.12)', border: '1px solid rgba(255, 255, 255, 0.25)', padding: '1.25rem 2rem', borderRadius: '14px', textAlign: 'center', backdropFilter: 'blur(4px)' }}>
             <span style={{ fontSize: '0.75rem', color: '#BFDBFE', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: '800', display: 'block' }}>
-              APTITUDE SCORE
+              TOTAL MARKS SCORED
             </span>
-            <div style={{ fontSize: '3rem', fontWeight: '900', color: '#FFFFFF', lineHeight: '1.1', margin: '0.2rem 0' }}>
-              {result.percentage.toFixed(0)}<span style={{ fontSize: '1.5rem', color: '#BFDBFE' }}>%</span>
+            <div style={{ fontSize: '2.8rem', fontWeight: '900', color: '#FFFFFF', lineHeight: '1.1', margin: '0.2rem 0' }}>
+              {result.total_score.toFixed(1)} <span style={{ fontSize: '1.4rem', color: '#BFDBFE' }}>/ {result.max_possible_score}</span>
+            </div>
+            <div style={{ fontSize: '0.9rem', color: '#93C5FD', fontWeight: '700', marginBottom: '0.4rem' }}>
+              {result.percentage.toFixed(0)}% Overall Score
             </div>
             <span className={`badge ${getPerformanceBadgeColor(result.performance_level)}`} style={{ fontSize: '0.85rem' }}>
               {result.performance_level} Performance
@@ -69,23 +72,31 @@ export const AptitudeResultPage: React.FC<AptitudeResultPageProps> = ({
 
       {/* METRIC HIGHLIGHTS CARDS */}
       <div className="grid grid-4 gap-4" style={{ marginBottom: '2.5rem' }}>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>OVERALL SCORE</span>
-          <h3 style={{ fontSize: '1.8rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{result.total_score} <span style={{ fontSize: '1rem', color: '#94A3B8' }}>/ {result.max_possible_score}</span></h3>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '4px solid #2563EB' }}>
+          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>TOTAL MARKS</span>
+          <h3 style={{ fontSize: '1.8rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{result.total_score.toFixed(1)} <span style={{ fontSize: '1rem', color: '#94A3B8' }}>/ {result.max_possible_score}</span></h3>
+          <span style={{ fontSize: '0.78rem', color: '#2563EB', fontWeight: '600' }}>{result.percentage.toFixed(1)}% Marks</span>
         </div>
-        <div className="card" style={{ padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '4px solid #16A34A' }}>
           <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>ACCURACY RATE</span>
           <h3 style={{ fontSize: '1.8rem', color: '#16A34A', marginTop: '0.2rem' }}>{result.accuracy}%</h3>
+          <span style={{ fontSize: '0.78rem', color: '#16A34A', fontWeight: '600' }}>{result.correct_count} Correct Answers</span>
         </div>
-        <div className="card" style={{ padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '4px solid #DC2626' }}>
           <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>CORRECT / INCORRECT</span>
           <h3 style={{ fontSize: '1.8rem', color: '#1E3A5F', marginTop: '0.2rem' }}>
             <span style={{ color: '#16A34A' }}>{result.correct_count}</span> / <span style={{ color: '#DC2626' }}>{result.incorrect_count}</span>
           </h3>
+          <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: '600' }}>
+            Skipped/Unanswered: {result.question_reviews.length - (result.correct_count + result.incorrect_count)}
+          </span>
         </div>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>TIME TAKEN</span>
+        <div className="card" style={{ padding: '1.25rem', borderLeft: '4px solid #D97706' }}>
+          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: '700', textTransform: 'uppercase' }}>TIME DURATION</span>
           <h3 style={{ fontSize: '1.8rem', color: '#2563EB', marginTop: '0.2rem' }}>{Math.round(result.time_taken_seconds / 60)} min</h3>
+          <span style={{ fontSize: '0.78rem', color: '#D97706', fontWeight: '600' }}>
+            Avg {Math.round(result.time_taken_seconds / (result.question_reviews.length || 1))}s per question
+          </span>
         </div>
       </div>
 

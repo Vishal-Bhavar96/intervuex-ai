@@ -17,9 +17,24 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validatePasswordRules = (pwd: string) => {
+    const hasMinLength = pwd.length >= 8;
+    const hasLetter = /[a-zA-Z]/.test(pwd);
+    const hasNumber = /[0-9]/.test(pwd);
+    return { hasMinLength, hasLetter, hasNumber, isValid: hasMinLength && hasLetter && hasNumber };
+  };
+
+  const pwdValidation = validatePasswordRules(password);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!pwdValidation.isValid) {
+      setError('Password must be at least 8 characters long and contain both letters and numbers.');
+      return;
+    }
+
     setLoading(true);
     try {
       await register(email, password, fullName, role);
@@ -44,7 +59,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
 
         {error && (
           <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#DC2626', padding: '0.75rem', borderRadius: '6px', fontSize: '0.875rem', marginBottom: '1rem' }}>
-            {error}
+            ⚠ {error}
           </div>
         )}
 
@@ -81,7 +96,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
             </div>
           </div>
 
-          <div className="form-group">
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
             <label className="form-label">Password</label>
             <div style={{ position: 'relative' }}>
               <Key size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
@@ -91,7 +106,10 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
                 style={{ paddingLeft: '2.4rem', paddingRight: '2.5rem' }}
                 placeholder="At least 8 characters"
                 value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError('');
+                }} 
                 required 
               />
               <button 
@@ -102,6 +120,22 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ onSuccess, onSwitchT
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+            </div>
+
+            {/* Password Rules Checklist Box */}
+            <div style={{ marginTop: '0.5rem', background: '#F8FAFC', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid #E2E8F0', fontSize: '0.78rem' }}>
+              <div style={{ fontWeight: '700', color: '#475569', marginBottom: '0.35rem' }}>Password Requirements:</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                <span style={{ color: pwdValidation.hasMinLength ? '#16A34A' : '#64748B', fontWeight: pwdValidation.hasMinLength ? '700' : '400' }}>
+                  {pwdValidation.hasMinLength ? '✓' : '•'} Minimum 8 characters
+                </span>
+                <span style={{ color: pwdValidation.hasLetter ? '#16A34A' : '#64748B', fontWeight: pwdValidation.hasLetter ? '700' : '400' }}>
+                  {pwdValidation.hasLetter ? '✓' : '•'} At least one letter (a-z, A-Z)
+                </span>
+                <span style={{ color: pwdValidation.hasNumber ? '#16A34A' : '#64748B', fontWeight: pwdValidation.hasNumber ? '700' : '400' }}>
+                  {pwdValidation.hasNumber ? '✓' : '•'} At least one number (0-9)
+                </span>
+              </div>
             </div>
           </div>
 
