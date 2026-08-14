@@ -3,7 +3,8 @@ import { api } from '../services/api';
 import { AptitudeAttemptState, CandidateAptitudeQuestion } from '../types/aptitude';
 import { 
   Clock, AlertTriangle, CheckCircle, Bookmark, ArrowLeft, ArrowRight, 
-  Send, Camera, ShieldAlert, Wifi, Maximize2, RefreshCw
+  Send, Camera, ShieldAlert, Wifi, Maximize2, RefreshCw,
+  CameraOff, Mic, MicOff
 } from 'lucide-react';
 
 interface AptitudeTestPageProps {
@@ -31,11 +32,35 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
   const [monitoringCount, setMonitoringCount] = useState<number>(0);
   const [latestEventMsg, setLatestEventMsg] = useState<string | null>(null);
   const [cameraConnected, setCameraConnected] = useState<boolean>(false);
+  const [isCameraOff, setIsCameraOff] = useState<boolean>(false);
+  const [isMicMuted, setIsMicMuted] = useState<boolean>(false);
 
   const miniVideoRef = useRef<HTMLVideoElement>(null);
   const timerIntervalRef = useRef<any>(null);
   const questionStartTimeRef = useRef<number>(Date.now());
   const prevFrameDataRef = useRef<Uint8ClampedArray | null>(null);
+
+  // Toggle Camera On/Off
+  const handleToggleCamera = () => {
+    const nextState = !isCameraOff;
+    setIsCameraOff(nextState);
+    if (activeStream) {
+      activeStream.getVideoTracks().forEach((track) => {
+        track.enabled = !nextState;
+      });
+    }
+  };
+
+  // Toggle Mic On/Off
+  const handleToggleMic = () => {
+    const nextState = !isMicMuted;
+    setIsMicMuted(nextState);
+    if (activeStream) {
+      activeStream.getAudioTracks().forEach((track) => {
+        track.enabled = !nextState;
+      });
+    }
+  };
 
   // Initialize or fallback camera stream if missing
   useEffect(() => {
@@ -48,7 +73,12 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 400 }, height: { ideal: 300 } },
-          audio: false
+          audio: true
+        }).catch(async () => {
+          return await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 400 }, height: { ideal: 300 } },
+            audio: false
+          });
         });
         if (!unmounted) {
           setActiveStream(stream);
@@ -190,7 +220,7 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
     const ctx = canvas.getContext('2d');
 
     const motionInterval = setInterval(() => {
-      if (!miniVideoRef.current || !ctx || !cameraConnected) return;
+      if (!miniVideoRef.current || !ctx || !cameraConnected || isCameraOff) return;
       try {
         ctx.drawImage(miniVideoRef.current, 0, 0, 80, 60);
         const frame = ctx.getImageData(0, 0, 80, 60);
@@ -220,7 +250,7 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
     return () => {
       clearInterval(motionInterval);
     };
-  }, [cameraConnected, attempt.attempt_id]);
+  }, [cameraConnected, isCameraOff, attempt.attempt_id]);
 
   // Countdown Timer & Auto-Submit on Expiration
   useEffect(() => {
@@ -528,7 +558,7 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
           
           {/* Proctored Mini Camera Overlay */}
           <div className="card" style={{ padding: '0.75rem', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.35rem' }}>
               <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#1E3A5F', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 <Camera size={14} color="#2563EB" /> LIVE PROCTORED FEED
               </span>
@@ -538,16 +568,77 @@ export const AptitudeTestPage: React.FC<AptitudeTestPageProps> = ({
             </div>
 
             <div style={{ background: '#0F172A', borderRadius: '8px', overflow: 'hidden', height: '160px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <video 
-                ref={miniVideoRef} 
-                autoPlay 
-                playsInline 
-                muted 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              />
-              <div style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(15, 23, 42, 0.85)', color: cameraConnected ? '#10B981' : '#F59E0B', padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: cameraConnected ? '#10B981' : '#F59E0B' }}></span>
-                {cameraConnected ? 'Proctored Active' : 'Connecting Camera...'}
+              {isCameraOff ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', color: '#94A3B8' }}>
+                  <CameraOff size={34} color="#EF4444" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#CBD5E1' }}>Camera Paused</span>
+                </div>
+              ) : (
+                <video 
+                  ref={miniVideoRef} 
+                  autoPlay 
+                  playsInline 
+                  muted 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+              )}
+
+              {/* Quick Toggle Buttons: Camera & Microphone */}
+              <div style={{ position: 'absolute', top: '6px', right: '6px', display: 'flex', gap: '0.35rem', zIndex: 10 }}>
+                <button
+                  type="button"
+                  onClick={handleToggleCamera}
+                  title={isCameraOff ? "Turn Camera On" : "Turn Camera Off"}
+                  style={{
+                    background: isCameraOff ? 'rgba(220, 38, 38, 0.9)' : 'rgba(15, 23, 42, 0.8)',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '6px',
+                    padding: '0.25rem 0.45rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    transition: 'all 0.2s ease',
+                    backdropFilter: 'blur(4px)'
+                  }}
+                >
+                  {isCameraOff ? <CameraOff size={12} /> : <Camera size={12} />}
+                  <span>{isCameraOff ? 'Cam Off' : 'Cam On'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleToggleMic}
+                  title={isMicMuted ? "Unmute Microphone" : "Mute Microphone"}
+                  style={{
+                    background: isMicMuted ? 'rgba(220, 38, 38, 0.9)' : 'rgba(15, 23, 42, 0.8)',
+                    color: '#FFFFFF',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '6px',
+                    padding: '0.25rem 0.45rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    transition: 'all 0.2s ease',
+                    backdropFilter: 'blur(4px)'
+                  }}
+                >
+                  {isMicMuted ? <MicOff size={12} /> : <Mic size={12} />}
+                  <span>{isMicMuted ? 'Mic Off' : 'Mic On'}</span>
+                </button>
+              </div>
+
+              {/* Status Badge */}
+              <div style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(15, 23, 42, 0.85)', color: isCameraOff ? '#EF4444' : (cameraConnected ? '#10B981' : '#F59E0B'), padding: '0.2rem 0.55rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: isCameraOff ? '#EF4444' : (cameraConnected ? '#10B981' : '#F59E0B') }}></span>
+                {isCameraOff ? 'Camera Paused' : (cameraConnected ? 'Proctored Active' : 'Connecting Camera...')}
+                {isMicMuted && <span style={{ color: '#FCA5A5', marginLeft: '0.2rem' }}>(Mic Muted)</span>}
               </div>
             </div>
           </div>
