@@ -46,6 +46,36 @@ def seed_demo_data(db: Session):
         db.commit()
         db.refresh(admin_user)
 
+    # 3. Senior Candidate User - Alex Rivers
+    alex_user = db.query(User).filter(User.email == "alex.candidate@intervuex.com").first()
+    if not alex_user:
+        logger.info("Seeding demo senior candidate user (alex.candidate@intervuex.com)...")
+        alex_user = User(
+            email="alex.candidate@intervuex.com",
+            hashed_password=get_password_hash("Password123!"),
+            full_name="Alex Rivers",
+            role="CANDIDATE",
+            is_active=True
+        )
+        db.add(alex_user)
+        db.commit()
+        db.refresh(alex_user)
+
+    # 4. Data Science Candidate User - Priya Sharma
+    priya_user = db.query(User).filter(User.email == "priya.candidate@intervuex.com").first()
+    if not priya_user:
+        logger.info("Seeding demo data science candidate user (priya.candidate@intervuex.com)...")
+        priya_user = User(
+            email="priya.candidate@intervuex.com",
+            hashed_password=get_password_hash("Password123!"),
+            full_name="Priya Sharma",
+            role="CANDIDATE",
+            is_active=True
+        )
+        db.add(priya_user)
+        db.commit()
+        db.refresh(priya_user)
+
     # 3. Candidate Profile
     profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == candidate_user.id).first()
     if not profile:

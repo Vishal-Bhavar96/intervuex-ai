@@ -20,18 +20,25 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (e: any) {
+    throw new ApiError('Cannot connect to backend server. Please verify the backend service is running on http://127.0.0.1:8000.', 0);
+  }
 
   if (!response.ok) {
-    let errorDetail = 'An unexpected error occurred';
+    let errorDetail = `Server error (${response.status})`;
     try {
       const errJson = await response.json();
       errorDetail = errJson.detail || errorDetail;
     } catch (e) {
-      // ignore
+      if (response.status === 500 || response.status === 502 || response.status === 504) {
+        errorDetail = `Backend server unavailable (${response.status}). Please check if the FastAPI backend is running on port 8000.`;
+      }
     }
     throw new ApiError(errorDetail, response.status);
   }
