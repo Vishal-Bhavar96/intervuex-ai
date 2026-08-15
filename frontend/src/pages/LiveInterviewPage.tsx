@@ -308,7 +308,7 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
               </div>
             </div>
 
-            <h3 style={{ fontSize: '1.25rem', color: '#111827', lineHeight: '1.4', marginBottom: '0.75rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--heading)', lineHeight: '1.4', marginBottom: '0.75rem' }}>
               "{currentQuestion.question_text}"
             </h3>
 
