@@ -176,21 +176,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onSwitchToRegis
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#1E293B' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#0F172A' }}>
               <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={16} />
               </div>
               <span>✓ Resume analysis</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#1E293B' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#0F172A' }}>
               <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={16} />
               </div>
               <span>✓ Adaptive interviews</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#1E293B' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', fontWeight: '600', color: '#0F172A' }}>
               <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={16} />
               </div>

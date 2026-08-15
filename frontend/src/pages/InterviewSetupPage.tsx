@@ -326,7 +326,7 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
               >
                 <input type="radio" checked={feedbackMode === 'INSTANT'} readOnly style={{ marginTop: '3px' }} />
                 <div>
-                  <strong style={{ fontSize: '0.9rem', color: '#1E293B', display: 'block' }}>○ Instant</strong>
+                  <strong style={{ fontSize: '0.9rem', color: '#0F172A', display: 'block' }}>○ Instant</strong>
                   <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Feedback displayed immediately after every answer submission</span>
                 </div>
               </div>
@@ -341,7 +341,7 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
               >
                 <input type="radio" checked={feedbackMode === 'END_OF_INTERVIEW'} readOnly style={{ marginTop: '3px' }} />
                 <div>
-                  <strong style={{ fontSize: '0.9rem', color: '#1E293B', display: 'block' }}>● End of Interview</strong>
+                  <strong style={{ fontSize: '0.9rem', color: '#0F172A', display: 'block' }}>● End of Interview</strong>
                   <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Full multi-dimensional score & evaluation revealed after completion</span>
                 </div>
               </div>
@@ -356,7 +356,7 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
               >
                 <input type="radio" checked={feedbackMode === 'HIDDEN'} readOnly style={{ marginTop: '3px' }} />
                 <div>
-                  <strong style={{ fontSize: '0.9rem', color: '#1E293B', display: 'block' }}>○ Hidden</strong>
+                  <strong style={{ fontSize: '0.9rem', color: '#0F172A', display: 'block' }}>○ Hidden</strong>
                   <span style={{ fontSize: '0.8rem', color: '#64748B' }}>No feedback until the interview ends (Realistic Exam Simulation)</span>
                 </div>
               </div>
