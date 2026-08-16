@@ -101,3 +101,35 @@ def add_project(
     db.commit()
     db.refresh(p)
     return p
+
+@router.delete("/skill/{skill_id}")
+def delete_skill(
+    skill_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == current_user.id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    sk = db.query(Skill).filter(Skill.id == skill_id, Skill.candidate_id == profile.id).first()
+    if not sk:
+        raise HTTPException(status_code=404, detail="Skill not found")
+    db.delete(sk)
+    db.commit()
+    return {"message": "Skill deleted successfully"}
+
+@router.delete("/project/{project_id}")
+def delete_project(
+    project_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == current_user.id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    p = db.query(Project).filter(Project.id == project_id, Project.candidate_id == profile.id).first()
+    if not p:
+        raise HTTPException(status_code=404, detail="Project not found")
+    db.delete(p)
+    db.commit()
+    return {"message": "Project deleted successfully"}

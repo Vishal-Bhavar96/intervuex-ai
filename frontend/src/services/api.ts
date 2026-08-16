@@ -57,7 +57,9 @@ export const api = {
   updateProfile: (data: any) => request<any>('/profile', { method: 'PUT', body: JSON.stringify(data) }),
   addEducation: (data: any) => request<any>('/profile/education', { method: 'POST', body: JSON.stringify(data) }),
   addSkill: (data: any) => request<any>('/profile/skill', { method: 'POST', body: JSON.stringify(data) }),
+  deleteSkill: (skillId: number) => request<any>(`/profile/skill/${skillId}`, { method: 'DELETE' }),
   addProject: (data: any) => request<any>('/profile/project', { method: 'POST', body: JSON.stringify(data) }),
+  deleteProject: (projectId: number) => request<any>(`/profile/project/${projectId}`, { method: 'DELETE' }),
 
   // Resume
   uploadResume: async (file: File) => {
