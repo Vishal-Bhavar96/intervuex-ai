@@ -177,238 +177,206 @@ class MockAIService(AIServiceInterface):
         second_skill = skill_names[1] if len(skill_names) > 1 else "Django"
         db_skill = next((s for s in skill_names if any(kw in s.lower() for kw in ["sql", "db", "postgres"])), "SQL")
 
-        # Placement-Oriented Company-Style Interview Questions for Freshers (Wipro, Capgemini, TCS, Cognizant, Infosys)
+        # 15 Core Structured Interviewer Questions
         fresher_sequence = [
             {
-                "question": f"Can you briefly introduce yourself and provide an overview of your project, '{project_title}'?",
-                "question_type": "resume",
+                "question": "Tell me about yourself.",
+                "question_type": "hr",
                 "resume_source": "RESUME",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": f"Evaluating candidate communication and project overview for '{project_title}'.",
+                "reason": "Evaluating candidate self-introduction, communication skills, and professional background.",
                 "reasons": [
                     f"✓ Candidate Target Role: {target_role}",
-                    f"✓ Resume Project: {project_title}",
-                    f"✓ Primary Tech Stack: {primary_skill}, {second_skill}"
+                    "✓ Evaluating self-introduction, communication, and background overview"
                 ],
-                "expected_topics": ["Self Introduction", "Project Purpose", "Tech Stack Overview"]
+                "expected_topics": ["Self Introduction", "Background", "Career Objective"]
             },
             {
-                "question": f"What was your individual role in developing '{project_title}', and what core features did you personally write?",
+                "question": f"Can you explain your project, '{project_title}'?",
                 "question_type": "project",
                 "resume_source": "PROJECT",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": f"Assessing hands-on development contribution to '{project_title}'.",
+                "reason": f"Evaluating project overview and architecture for '{project_title}'.",
                 "reasons": [
                     f"✓ Project: {project_title} listed in resume",
-                    "✓ Evaluating hands-on feature ownership and coding role"
+                    "✓ Evaluating high-level project purpose and architecture"
                 ],
-                "expected_topics": ["Core Features", "Individual Contribution", "Implementation Details"]
+                "expected_topics": ["Project Purpose", "Architecture", "System Overview"]
             },
             {
-                "question": f"Why did you choose {second_skill} for developing '{project_title}' over other framework options?",
-                "question_type": "project",
-                "resume_source": "PROJECT",
-                "skill": second_skill,
-                "project": project_title,
-                "reason": f"Assessing technology selection rationale for '{project_title}'.",
-                "reasons": [
-                    f"✓ Technology {second_skill} used in {project_title}",
-                    "✓ Evaluating architectural decision-making & rationale"
-                ],
-                "expected_topics": [second_skill, "Framework Rationale", "Development Speed"]
-            },
-            {
-                "question": f"Your resume highlights {primary_skill}. Can you explain the difference between a list and a tuple in {primary_skill}, and when you should use a tuple?",
-                "question_type": "technical",
-                "resume_source": "RESUME",
-                "skill": primary_skill,
-                "project": project_title,
-                "reason": f"Testing programming language fundamentals in {primary_skill}.",
-                "reasons": [
-                    f"✓ {primary_skill} listed as technical skill",
-                    "✓ Testing memory immutability and core syntax fundamentals"
-                ],
-                "expected_topics": [primary_skill, "Data Structures", "Immutability vs Mutability"]
-            },
-            {
-                "question": f"In database design for '{project_title}' or {db_skill} queries, what is the difference between a Primary Key and a Foreign Key, and how do JOINs connect them?",
-                "question_type": "technical",
-                "resume_source": "RESUME",
-                "skill": db_skill,
-                "project": project_title,
-                "reason": f"Testing database design and relational SQL fundamentals.",
-                "reasons": [
-                    f"✓ {db_skill} listed in technical skills section",
-                    f"✓ Relational schema design in {project_title}"
-                ],
-                "expected_topics": [db_skill, "Primary Key vs Foreign Key", "SQL JOINs", "Database Schema"]
-            },
-            {
-                "question": f"How did you implement user authentication and data security in '{project_title}' to protect candidate data?",
-                "question_type": "project",
-                "resume_source": "PROJECT",
-                "skill": second_skill,
-                "project": project_title,
-                "reason": f"Evaluating authentication logic and session security in '{project_title}'.",
-                "reasons": [
-                    f"✓ Security module in {project_title}",
-                    "✓ Evaluating authentication & access control basics"
-                ],
-                "expected_topics": ["User Authentication", "Passwords/Hashing", "Session Management"]
-            },
-            {
-                "question": f"How did you structure database tables for '{project_title}', and how did you prevent duplicate records?",
-                "question_type": "project",
-                "resume_source": "PROJECT",
-                "skill": db_skill,
-                "project": project_title,
-                "reason": f"Assessing database table design and constraint validation.",
-                "reasons": [
-                    f"✓ Project database stack: {db_skill}",
-                    "✓ Assessing normalization & unique constraint validation"
-                ],
-                "expected_topics": ["Database Tables", "Constraints/Unique Keys", "Data Integrity"]
-            },
-            {
-                "question": f"What was one technical bug or problem you encountered while developing '{project_title}', and how did you debug and resolve it?",
+                "question": f"What was your specific role and personal contribution in developing '{project_title}'?",
                 "question_type": "project",
                 "resume_source": "PROJECT",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": "Evaluating problem-solving approach and technical resilience.",
+                "reason": f"Assessing individual contribution and hands-on coding role in '{project_title}'.",
                 "reasons": [
                     f"✓ Project: {project_title}",
-                    "✓ Testing debugging methodology and problem solving"
+                    "✓ Evaluating hands-on feature ownership and individual coding role"
                 ],
-                "expected_topics": ["Debugging", "Bug Fixing", "Troubleshooting"]
+                "expected_topics": ["Individual Role", "Code Ownership", "Features Developed"]
             },
             {
-                "question": f"For your target role as {target_role}, how would you design a simple REST API endpoint (e.g. GET /api/data) using {primary_skill}?",
-                "question_type": "job_match",
-                "resume_source": "JOB MATCH",
+                "question": f"What technologies, frameworks, and tools did you use in developing '{project_title}'?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": f"Evaluating REST API design principles for target role '{target_role}'.",
+                "reason": f"Assessing technical stack selection for '{project_title}'.",
                 "reasons": [
-                    f"✓ Target Role: {target_role}",
-                    f"✓ Skill Alignment: {primary_skill} REST API design"
+                    f"✓ Project Tech Stack: {project_techs}",
+                    "✓ Evaluating technology stack choices and tool selection"
                 ],
-                "expected_topics": ["REST API", "HTTP Verbs", "JSON Formatting"]
+                "expected_topics": ["Technology Stack", "Frameworks", "Database & Tools"]
             },
             {
-                "question": f"Why are you interested in a {target_role} position, and where do you see your technical skills growing in the next two years?",
+                "question": f"What major technical challenges or bugs did you face while building '{project_title}'?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Evaluating technical problem identification and complexity in '{project_title}'.",
+                "reasons": [
+                    f"✓ Project: {project_title}",
+                    "✓ Evaluating technical hurdles, edge cases, and bug identification"
+                ],
+                "expected_topics": ["Technical Challenges", "Bugs", "System Bottlenecks"]
+            },
+            {
+                "question": f"How did you solve those technical challenges, and what was your step-by-step resolution process?",
+                "question_type": "project",
+                "resume_source": "PROJECT",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": "Assessing problem-solving process, debugging strategy, and resilience.",
+                "reasons": [
+                    f"✓ Problem solving in {project_title}",
+                    "✓ Evaluating debugging strategy, testing, and technical resolution"
+                ],
+                "expected_topics": ["Problem Solving", "Debugging Process", "Solution Architecture"]
+            },
+            {
+                "question": "What is Python, and what are its key features that make it popular in modern software engineering?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": "Python",
+                "project": project_title,
+                "reason": "Testing core programming language fundamentals in Python.",
+                "reasons": [
+                    "✓ Python listed in technical skills",
+                    "✓ Testing language features, dynamic typing, and ecosystem"
+                ],
+                "expected_topics": ["Python", "Dynamic Typing", "Interpreted Language", "Standard Library"]
+            },
+            {
+                "question": "What is OOP (Object-Oriented Programming), and can you explain its core pillars with examples?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": "Testing Object-Oriented Programming concepts.",
+                "reasons": [
+                    "✓ Fundamental OOP architecture check",
+                    "✓ Testing Encapsulation, Abstraction, Inheritance, and Polymorphism"
+                ],
+                "expected_topics": ["OOP", "Encapsulation", "Inheritance", "Polymorphism", "Abstraction"]
+            },
+            {
+                "question": "What is SQL, and how do you write queries using clauses like WHERE, GROUP BY, and JOINs?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": db_skill,
+                "project": project_title,
+                "reason": "Testing relational database fundamentals and query writing.",
+                "reasons": [
+                    f"✓ {db_skill} database skills check",
+                    "✓ Testing relational queries, filtering, grouping, and JOINs"
+                ],
+                "expected_topics": ["SQL", "Relational Database", "Queries", "JOINs", "GROUP BY"]
+            },
+            {
+                "question": "What is a REST API, and what are standard HTTP methods (GET, POST, PUT, DELETE) and status codes?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": "REST API",
+                "project": project_title,
+                "reason": "Testing Web API architecture and HTTP protocol knowledge.",
+                "reasons": [
+                    "✓ REST API web development skills check",
+                    "✓ Testing HTTP methods, endpoints, JSON payload formatting, and status codes"
+                ],
+                "expected_topics": ["REST API", "HTTP Verbs", "JSON", "Status Codes"]
+            },
+            {
+                "question": "What is the difference between SQL (relational) and NoSQL (non-relational) databases, and when would you choose one over the other?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": db_skill,
+                "project": project_title,
+                "reason": "Testing database architectural selection and SQL vs NoSQL trade-offs.",
+                "reasons": [
+                    "✓ Database architecture evaluation",
+                    "✓ Testing ACID compliance vs eventual consistency, scaling, and schema flexibility"
+                ],
+                "expected_topics": ["SQL vs NoSQL", "Relational vs Document", "ACID", "Scalability"]
+            },
+            {
+                "question": "How do you handle errors and exceptions in Python using try-except-finally blocks?",
+                "question_type": "technical",
+                "resume_source": "TECHNICAL",
+                "skill": "Python",
+                "project": project_title,
+                "reason": "Testing exception handling and production code reliability in Python.",
+                "reasons": [
+                    "✓ Python exception handling check",
+                    "✓ Testing try-except blocks, custom exceptions, and error logging"
+                ],
+                "expected_topics": ["Exception Handling", "try-except", "Custom Exceptions", "Error Logging"]
+            },
+            {
+                "question": f"Explain your strongest technical skill ({primary_skill}), how you mastered it, and a practical application where you used it.",
+                "question_type": "technical",
+                "resume_source": "RESUME",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": f"Evaluating candidate's depth of mastery in primary skill ({primary_skill}).",
+                "reasons": [
+                    f"✓ Primary Skill: {primary_skill}",
+                    "✓ Evaluating technical confidence, depth of mastery, and practical usage"
+                ],
+                "expected_topics": [primary_skill, "Technical Depth", "Practical Application"]
+            },
+            {
+                "question": f"Why should we hire you for this {target_role} position?",
                 "question_type": "hr",
                 "resume_source": "HR",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": f"Assessing career motivation and placement readiness for {target_role}.",
+                "reason": f"Evaluating candidate self-awareness, unique value proposition, and role alignment for {target_role}.",
                 "reasons": [
                     f"✓ Target Role: {target_role}",
-                    "✓ Evaluating career motivation, communication, and placement fit"
+                    "✓ Assessing candidate pitch, confidence, and placement suitability"
                 ],
-                "expected_topics": ["Career Motivation", "Placement Readiness", "Communication"]
+                "expected_topics": ["Candidate Pitch", "Value Proposition", "Role Fit"]
+            },
+            {
+                "question": "Where do you see yourself in 5 years in your software engineering career?",
+                "question_type": "hr",
+                "resume_source": "HR",
+                "skill": primary_skill,
+                "project": project_title,
+                "reason": "Evaluating long-term career ambition, growth mindset, and vision.",
+                "reasons": [
+                    "✓ Long-term career vision check",
+                    "✓ Assessing commitment, growth goals, and leadership/technical trajectory"
+                ],
+                "expected_topics": ["5-Year Vision", "Career Growth", "Leadership/Technical Aspirations"]
             }
         ]
 
-        if interview_type == "PROJECT_DEFENSE":
-            defense_sequence = [
-                {
-                    "question": f"Can you explain your project '{project_title}' and its primary business/technical objective?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": primary_skill,
-                    "project": project_title,
-                    "reason": f"Evaluating high-level architecture and project understanding for '{project_title}'.",
-                    "reasons": [
-                        f"✓ Project: {project_title} portfolio defense",
-                        "✓ Evaluating core project understanding & system overview"
-                    ],
-                    "expected_topics": ["Project Purpose", "System Overview", "Architecture"]
-                },
-                {
-                    "question": f"Why did you choose {second_skill} for developing '{project_title}' instead of other frameworks or technology options?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": second_skill,
-                    "project": project_title,
-                    "reason": f"Assessing technology selection rationale for '{project_title}'.",
-                    "reasons": [
-                        f"✓ Technology {second_skill} used in {project_title}",
-                        "✓ Evaluating framework selection & engineering trade-offs"
-                    ],
-                    "expected_topics": [second_skill, "Framework Rationale", "Tech Selection"]
-                },
-                {
-                    "question": f"Can you explain the database tables, relationships, and schema design used in '{project_title}'?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": db_skill,
-                    "project": project_title,
-                    "reason": f"Assessing database schema modeling for '{project_title}'.",
-                    "reasons": [
-                        f"✓ Project database stack: {db_skill}",
-                        "✓ Assessing table structures, relationships, and normalization"
-                    ],
-                    "expected_topics": ["Database Schema", "Table Relationships", "Foreign Keys"]
-                },
-                {
-                    "question": f"How did you implement user authentication and access control in '{project_title}'?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": second_skill,
-                    "project": project_title,
-                    "reason": f"Evaluating authentication logic and session control in '{project_title}'.",
-                    "reasons": [
-                        f"✓ Security module in {project_title}",
-                        "✓ Assessing authentication implementation & security controls"
-                    ],
-                    "expected_topics": ["Authentication", "Session/Tokens", "Role-Based Access"]
-                },
-                {
-                    "question": f"How did you encrypt or protect files and sensitive data from unauthorized access in '{project_title}'?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": primary_skill,
-                    "project": project_title,
-                    "reason": f"Evaluating data protection and encryption mechanics in '{project_title}'.",
-                    "reasons": [
-                        f"✓ Security & Data protection in {project_title}",
-                        "✓ Testing file encryption & unauthorized access prevention"
-                    ],
-                    "expected_topics": ["Encryption", "Data Protection", "Secure Storage"]
-                },
-                {
-                    "question": f"What was the most difficult security or technical problem you faced while developing '{project_title}', and how did you resolve it?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": primary_skill,
-                    "project": project_title,
-                    "reason": f"Evaluating problem-solving methodology and technical resilience.",
-                    "reasons": [
-                        f"✓ Project: {project_title}",
-                        "✓ Testing debugging methodology and technical resilience"
-                    ],
-                    "expected_topics": ["Technical Challenges", "Debugging", "Bug Resolution"]
-                },
-                {
-                    "question": f"If '{project_title}' scaled to 100,000 active daily users, how would you redesign the architecture, database indexing, or caching layer to handle the load?",
-                    "question_type": "project",
-                    "resume_source": "PROJECT DEFENSE",
-                    "skill": primary_skill,
-                    "project": project_title,
-                    "reason": f"Testing scalability foresight and future scope for '{project_title}'.",
-                    "reasons": [
-                        f"✓ Project: {project_title}",
-                        "✓ Evaluating future scope, caching, and scalability foresight"
-                    ],
-                    "expected_topics": ["Scalability", "Caching/Redis", "Database Indexing", "Future Scope"]
-                }
-            ]
-            idx = (sequence_number - 1) % len(defense_sequence)
-            res = defense_sequence[idx]
-        elif interview_type == "CODING":
+        if interview_type == "CODING":
             res = {
                 "question": f"Write a {primary_skill} function `two_sum(nums: list[int], target: int) -> list[int]` that returns indices of the two numbers such that they add up to target. Optimize for O(n) time complexity.",
                 "question_type": "coding",
@@ -423,20 +391,6 @@ class MockAIService(AIServiceInterface):
                 ],
                 "code_starter": "def two_sum(nums: list[int], target: int) -> list[int]:\n    # Implement optimal O(n) solution using a dictionary\n    lookup = {}\n    for i, num in enumerate(nums):\n        diff = target - num\n        if diff in lookup:\n            return [lookup[diff], i]\n        lookup[num] = i\n    return []\n",
                 "code_language": primary_skill.lower()
-            }
-        elif interview_type == "HR" or interview_type == "BEHAVIORAL":
-            res = {
-                "question": f"Why are you interested in starting your career as a {target_role}, and how have your academic projects prepared you for this role?",
-                "question_type": "hr",
-                "resume_source": "HR",
-                "skill": primary_skill,
-                "project": project_title,
-                "expected_topics": ["Behavioral STAR", "Career Ambition", "Project Alignment"],
-                "reason": f"Evaluating career alignment and communication for entry-level {target_role}.",
-                "reasons": [
-                    f"✓ Target Role: {target_role}",
-                    "✓ Assessing soft skills, career goals, and placement motivation"
-                ]
             }
         else:
             idx = (sequence_number - 1) % len(fresher_sequence)
