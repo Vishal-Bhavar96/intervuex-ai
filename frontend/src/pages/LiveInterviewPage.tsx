@@ -143,9 +143,14 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
     }
   }, []);
 
-  const toggleSpeechRecording = () => {
+  const toggleSpeechRecording = async () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return;
+    
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in your browser. Please use Google Chrome, Microsoft Edge, or Safari.");
+      setSpeechSupported(false);
+      return;
+    }
 
     if (isRecording) {
       if (recognitionRef.current) {
@@ -158,35 +163,74 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
       }
       setIsRecording(false);
     } else {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-
-      baseTextRef.current = answerText;
-
-      recognition.onstart = () => setIsRecording(true);
-      recognition.onend = () => {
-        setIsRecording(false);
-        recognitionRef.current = null;
-      };
-
-      recognition.onresult = (event: any) => {
-        let transcript = '';
-        for (let i = 0; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
-        }
-        const combined = baseTextRef.current 
-          ? `${baseTextRef.current.trim()} ${transcript.trim()}` 
-          : transcript.trim();
-        setAnswerText(combined);
-      };
-
-      recognitionRef.current = recognition;
+      // Explicitly request microphone permissions first
       try {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          stream.getTracks().forEach(track => track.stop());
+        }
+      } catch (permissionErr: any) {
+        console.error('Microphone permission denied', permissionErr);
+        alert('Microphone access was denied. Please click the lock/settings icon in your browser URL address bar and allow Microphone permissions for this site.');
+        return;
+      }
+
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        baseTextRef.current = answerText;
+
+        recognition.onstart = () => {
+          setIsRecording(true);
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error event:', event.error);
+          setIsRecording(false);
+          recognitionRef.current = null;
+
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            alert('Microphone permission is blocked by your browser. Please enable microphone permissions in browser settings.');
+          } else if (event.error === 'network') {
+            alert('Speech recognition service network error. Please check your connection or type your answer.');
+          }
+        };
+
+        recognition.onend = () => {
+          setIsRecording(false);
+          recognitionRef.current = null;
+        };
+
+        recognition.onresult = (event: any) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcriptChunk = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcriptChunk + ' ';
+            } else {
+              interimTranscript += transcriptChunk;
+            }
+          }
+
+          const currentCaptured = (finalTranscript + interimTranscript).trim();
+          const combined = baseTextRef.current 
+            ? `${baseTextRef.current.trim()} ${currentCaptured}` 
+            : currentCaptured;
+          
+          setAnswerText(combined);
+        };
+
+        recognitionRef.current = recognition;
         recognition.start();
-      } catch (err) {
-        console.error('Speech recognition start failed', err);
+      } catch (err: any) {
+        console.error('Failed to initialize speech recognition:', err);
+        setIsRecording(false);
+        alert('Could not start voice recording. Please check your microphone device.');
       }
     }
   };
@@ -362,15 +406,40 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
 
           {/* Candidate Answer Box */}
           <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-              <label className="form-label">Your Response</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Your Response</label>
+                {isRecording && (
+                  <span style={{ 
+                    fontSize: '0.75rem', 
+                    color: '#DC2626', 
+                    fontWeight: '700', 
+                    background: '#FEF2F2', 
+                    padding: '0.25rem 0.65rem', 
+                    borderRadius: '9999px',
+                    border: '1px solid #FECACA',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}>
+                    🔴 Listening... Speak clearly into your mic
+                  </span>
+                )}
+              </div>
+
               {speechSupported ? (
                 <button 
+                  type="button"
                   className={`btn btn-sm ${isRecording ? 'btn-action' : 'btn-outline'}`}
                   onClick={toggleSpeechRecording}
-                  style={{ background: isRecording ? '#DC2626' : undefined }}
+                  style={{ 
+                    background: isRecording ? '#DC2626' : undefined,
+                    borderColor: isRecording ? '#DC2626' : undefined,
+                    color: isRecording ? '#FFFFFF' : undefined,
+                    fontWeight: '700'
+                  }}
                 >
-                  {isRecording ? <MicOff size={14} /> : <Mic size={14} />}
+                  {isRecording ? <MicOff size={14} /> : <Mic size={14} color="#2563EB" />}
                   {isRecording ? 'Stop Voice Recording' : '🎤 Answer Using Voice'}
                 </button>
               ) : (
@@ -380,10 +449,16 @@ export const LiveInterviewPage: React.FC<LiveInterviewPageProps> = ({ interviewI
 
             <textarea 
               className="form-textarea" 
-              style={{ minHeight: '180px', marginBottom: '1rem', fontSize: '0.95rem' }}
+              style={{ 
+                minHeight: '180px', 
+                marginBottom: '1rem', 
+                fontSize: '0.95rem',
+                borderColor: isRecording ? '#DC2626' : undefined,
+                boxShadow: isRecording ? '0 0 0 3px rgba(220, 38, 38, 0.12)' : undefined
+              }}
               value={answerText}
               onChange={e => setAnswerText(e.target.value)}
-              placeholder="Type or speak your answer here. Provide structured technical rationale, examples, and architecture considerations..."
+              placeholder={isRecording ? "Listening... Speak your answer now..." : "Type or speak your answer here. Provide structured technical rationale, examples, and architecture considerations..."}
             />
 
             <button 

@@ -109,6 +109,10 @@ const MainContent: React.FC = () => {
         {activeTab === 'login' && <LoginPage onSuccess={() => setActiveTab('dashboard')} onSwitchToRegister={() => setActiveTab('register')} />}
         {activeTab === 'register' && <RegisterPage onSuccess={() => setActiveTab('dashboard')} onSwitchToLogin={() => setActiveTab('login')} />}
 
+        {!user && !['landing', 'login', 'register'].includes(activeTab) && (
+          <LoginPage onSuccess={() => setActiveTab(activeTab === 'setup' ? 'setup' : 'dashboard')} onSwitchToRegister={() => setActiveTab('register')} />
+        )}
+
         {user && (
           <>
             {activeTab === 'dashboard' && (

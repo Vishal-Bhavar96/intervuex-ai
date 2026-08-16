@@ -86,13 +86,10 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
     }
   };
 
-  const handleStart = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStart = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
+    if (loading) return;
     setLoading(true);
-
-    // Concatenate focus areas
-    const activeCategories = Object.keys(focusCategories).filter(k => focusCategories[k]);
-    const allFocus = Array.from(new Set([...selectedChips, ...activeCategories]));
 
     try {
       const created = await api.createInterview({
@@ -102,9 +99,14 @@ export const InterviewSetupPage: React.FC<InterviewSetupPageProps> = ({ initialJ
         total_questions: totalQuestions,
         instant_feedback_enabled: feedbackMode === 'INSTANT',
       });
-      onInterviewCreated(created.id);
-    } catch (err) {
+      if (created && created.id) {
+        onInterviewCreated(created.id);
+      } else {
+        alert('Could not start interview. Invalid response from server.');
+      }
+    } catch (err: any) {
       console.error('Failed to create interview session', err);
+      alert(err.message || 'Failed to start interview session. Please check if the backend server is running.');
     } finally {
       setLoading(false);
     }
