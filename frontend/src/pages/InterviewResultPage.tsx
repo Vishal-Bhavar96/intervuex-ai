@@ -115,6 +115,88 @@ export const InterviewResultPage: React.FC<InterviewResultPageProps> = ({ interv
         </div>
       </div>
 
+      {/* Question-by-Question Performance & Improvement Breakdown */}
+      <div className="card" style={{ marginBottom: '2.5rem', border: '1px solid #E2E8F0', borderRadius: '16px' }}>
+        <h3 style={{ marginBottom: '1.25rem', color: '#1E3A5F', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <BarChart2 size={22} color="#2563EB" /> Question-by-Question Answer Review & Wrong Answer Analysis
+        </h3>
+        
+        {interview.questions && interview.questions.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {interview.questions.map((q, idx) => {
+              const evalObj = q.evaluation;
+              const qScore = evalObj ? evalObj.overall_score : 70;
+              const isWeakOrWrong = qScore < 75;
+
+              return (
+                <div 
+                  key={q.id || idx} 
+                  style={{ 
+                    background: isWeakOrWrong ? '#FEF2F2' : '#F8FAFC', 
+                    padding: '1.25rem', 
+                    borderRadius: '12px', 
+                    border: `1px solid ${isWeakOrWrong ? '#FECACA' : '#E2E8F0'}` 
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Question {idx + 1} ({q.question_type.toUpperCase()})
+                      </span>
+                      <h4 style={{ margin: '0.2rem 0 0 0', color: '#0F172A', fontSize: '1rem', fontWeight: '700' }}>
+                        {q.question_text}
+                      </h4>
+                    </div>
+                    <span 
+                      style={{ 
+                        padding: '0.35rem 0.8rem', 
+                        borderRadius: '9999px', 
+                        fontSize: '0.8rem', 
+                        fontWeight: '800',
+                        background: isWeakOrWrong ? '#DC2626' : '#16A34A',
+                        color: '#FFFFFF'
+                      }}
+                    >
+                      {isWeakOrWrong ? `❌ Needs Improvement (${qScore}/100)` : `✅ Strong Answer (${qScore}/100)`}
+                    </span>
+                  </div>
+
+                  {/* Candidate Answer */}
+                  <div style={{ background: '#FFFFFF', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid #CBD5E1', marginBottom: '0.75rem' }}>
+                    <strong style={{ fontSize: '0.8rem', color: '#475569', display: 'block', marginBottom: '0.25rem' }}>
+                      YOUR ANSWER:
+                    </strong>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#0F172A', whiteSpace: 'pre-wrap' }}>
+                      {q.answer ? q.answer.answer_text : 'No answer submitted.'}
+                    </p>
+                  </div>
+
+                  {/* Feedback & Improvement Notes */}
+                  {evalObj && (
+                    <div style={{ fontSize: '0.85rem', color: '#334155' }}>
+                      {evalObj.missing_concepts && evalObj.missing_concepts.length > 0 && (
+                        <div style={{ marginBottom: '0.4rem', color: '#DC2626' }}>
+                          <strong>Missing Concepts / Key Gaps: </strong>
+                          {Array.isArray(evalObj.missing_concepts) ? evalObj.missing_concepts.join(', ') : evalObj.missing_concepts}
+                        </div>
+                      )}
+                      {evalObj.recommended_follow_up && (
+                        <div style={{ color: '#1E3A5F' }}>
+                          <strong>💡 How to Improve: </strong>
+                          {evalObj.recommended_follow_up}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p style={{ color: '#64748B' }}>No questions found for this interview.</p>
+        )}
+      </div>
+
       {/* Strengths and Weaknesses */}
       <div className="grid grid-2 gap-6" style={{ marginBottom: '2.5rem' }}>
         <div className="card">

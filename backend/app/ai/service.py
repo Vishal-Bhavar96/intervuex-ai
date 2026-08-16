@@ -177,15 +177,15 @@ class MockAIService(AIServiceInterface):
         second_skill = skill_names[1] if len(skill_names) > 1 else "Django"
         db_skill = next((s for s in skill_names if any(kw in s.lower() for kw in ["sql", "db", "postgres"])), "SQL")
 
-        # 15 Core Structured Interviewer Questions
+        # 15 Core Fresher-Friendly Structured Interviewer Questions (Personalized per logged-in candidate)
         fresher_sequence = [
             {
-                "question": "Tell me about yourself.",
+                "question": f"Tell me about yourself, your academic background, and what interests you about becoming a {target_role}.",
                 "question_type": "hr",
                 "resume_source": "RESUME",
                 "skill": primary_skill,
                 "project": project_title,
-                "reason": "Evaluating candidate self-introduction, communication skills, and professional background.",
+                "reason": f"Evaluating candidate self-introduction and career interest in {target_role}.",
                 "reasons": [
                     f"✓ Candidate Target Role: {target_role}",
                     "✓ Evaluating self-introduction, communication, and background overview"
@@ -219,7 +219,7 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["Individual Role", "Code Ownership", "Features Developed"]
             },
             {
-                "question": f"What technologies, frameworks, and tools did you use in developing '{project_title}'?",
+                "question": f"What technologies, frameworks ({project_techs}), and tools did you use in developing '{project_title}'?",
                 "question_type": "project",
                 "resume_source": "PROJECT",
                 "skill": primary_skill,
@@ -245,7 +245,7 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["Technical Challenges", "Bugs", "System Bottlenecks"]
             },
             {
-                "question": f"How did you solve those technical challenges, and what was your step-by-step resolution process?",
+                "question": f"How did you solve those technical challenges in '{project_title}', and what was your step-by-step resolution process?",
                 "question_type": "project",
                 "resume_source": "PROJECT",
                 "skill": primary_skill,
@@ -258,20 +258,20 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["Problem Solving", "Debugging Process", "Solution Architecture"]
             },
             {
-                "question": "What is Python, and what are its key features that make it popular in modern software engineering?",
+                "question": f"What is {primary_skill}, and what are its key features that make it popular in modern software engineering?",
                 "question_type": "technical",
                 "resume_source": "TECHNICAL",
-                "skill": "Python",
+                "skill": primary_skill,
                 "project": project_title,
-                "reason": "Testing core programming language fundamentals in Python.",
+                "reason": f"Testing core programming language fundamentals in {primary_skill}.",
                 "reasons": [
-                    "✓ Python listed in technical skills",
+                    f"✓ {primary_skill} listed in technical skills",
                     "✓ Testing language features, dynamic typing, and ecosystem"
                 ],
-                "expected_topics": ["Python", "Dynamic Typing", "Interpreted Language", "Standard Library"]
+                "expected_topics": [primary_skill, "Core Features", "Syntax & Ecosystem"]
             },
             {
-                "question": "What is OOP (Object-Oriented Programming), and can you explain its core pillars with examples?",
+                "question": "What is Object-Oriented Programming (OOP), and can you explain its core pillars (Encapsulation, Inheritance, Polymorphism, Abstraction) with examples?",
                 "question_type": "technical",
                 "resume_source": "TECHNICAL",
                 "skill": primary_skill,
@@ -284,17 +284,17 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["OOP", "Encapsulation", "Inheritance", "Polymorphism", "Abstraction"]
             },
             {
-                "question": "What is SQL, and how do you write queries using clauses like WHERE, GROUP BY, and JOINs?",
+                "question": f"What is {db_skill}, and how do you write basic queries using clauses like WHERE, GROUP BY, and JOINs?",
                 "question_type": "technical",
                 "resume_source": "TECHNICAL",
                 "skill": db_skill,
                 "project": project_title,
-                "reason": "Testing relational database fundamentals and query writing.",
+                "reason": f"Testing relational database fundamentals and query writing in {db_skill}.",
                 "reasons": [
                     f"✓ {db_skill} database skills check",
                     "✓ Testing relational queries, filtering, grouping, and JOINs"
                 ],
-                "expected_topics": ["SQL", "Relational Database", "Queries", "JOINs", "GROUP BY"]
+                "expected_topics": [db_skill, "Relational Database", "Queries", "JOINs", "GROUP BY"]
             },
             {
                 "question": "What is a REST API, and what are standard HTTP methods (GET, POST, PUT, DELETE) and status codes?",
@@ -310,7 +310,7 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["REST API", "HTTP Verbs", "JSON", "Status Codes"]
             },
             {
-                "question": "What is the difference between SQL (relational) and NoSQL (non-relational) databases, and when would you choose one over the other?",
+                "question": f"What is the difference between SQL (relational) and NoSQL (non-relational) databases, and when would you choose {db_skill} over NoSQL?",
                 "question_type": "technical",
                 "resume_source": "TECHNICAL",
                 "skill": db_skill,
@@ -323,14 +323,14 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["SQL vs NoSQL", "Relational vs Document", "ACID", "Scalability"]
             },
             {
-                "question": "How do you handle errors and exceptions in Python using try-except-finally blocks?",
+                "question": f"How do you handle errors and exceptions in {primary_skill} using try-except-finally blocks?",
                 "question_type": "technical",
                 "resume_source": "TECHNICAL",
-                "skill": "Python",
+                "skill": primary_skill,
                 "project": project_title,
-                "reason": "Testing exception handling and production code reliability in Python.",
+                "reason": f"Testing exception handling and code reliability in {primary_skill}.",
                 "reasons": [
-                    "✓ Python exception handling check",
+                    f"✓ {primary_skill} exception handling check",
                     "✓ Testing try-except blocks, custom exceptions, and error logging"
                 ],
                 "expected_topics": ["Exception Handling", "try-except", "Custom Exceptions", "Error Logging"]
@@ -362,7 +362,7 @@ class MockAIService(AIServiceInterface):
                 "expected_topics": ["Candidate Pitch", "Value Proposition", "Role Fit"]
             },
             {
-                "question": "Where do you see yourself in 5 years in your software engineering career?",
+                "question": f"Where do you see yourself in 5 years in your engineering career as a {target_role}?",
                 "question_type": "hr",
                 "resume_source": "HR",
                 "skill": primary_skill,
