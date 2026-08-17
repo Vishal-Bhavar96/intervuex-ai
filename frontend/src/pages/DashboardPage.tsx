@@ -34,14 +34,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
     return <div style={{ padding: '3rem', textAlign: 'center' }}>Loading your IntervueX workspace...</div>;
   }
 
-  const resumeScore = metrics?.resume_score || 78;
-  const jobMatchScore = metrics?.job_match_score || 76;
-  const aptitudeScore = metrics?.aptitude_score || 76;
-  const readinessScore = metrics?.career_readiness_score || 81;
-  const readinessCategory = metrics?.readiness_category || 'Good Performance';
-  const lastAptitudeDate = metrics?.last_aptitude_date || '13 Aug 2026';
-  const bestAptitudeScore = metrics?.best_aptitude_score || 82;
-  const totalAptitudeTests = metrics?.total_aptitude_tests_completed || 4;
+  const resumeCompleted = Boolean(metrics?.resume_completed);
+  const resumeScore = resumeCompleted ? (metrics?.resume_score ?? 0) : 0;
+
+  const jobMatchCompleted = Boolean(metrics?.job_match_completed);
+  const jobMatchScore = jobMatchCompleted ? (metrics?.job_match_score ?? 0) : 0;
+
+  const aptitudeCompleted = Boolean(metrics?.aptitude_completed);
+  const aptitudeScore = aptitudeCompleted ? (metrics?.aptitude_score ?? 0) : 0;
+
+  const completedCount = metrics?.completed_parameters_count ?? 0;
+  const readinessScore = completedCount > 0 ? (metrics?.career_readiness_score ?? 0) : 0;
+  const readinessCategory = completedCount > 0 ? (metrics?.readiness_category || 'Good Performance') : 'Pending Evaluation';
+
+  const lastAptitudeDate = metrics?.last_aptitude_date;
+  const bestAptitudeScore = metrics?.best_aptitude_score ?? 0;
 
   return (
     <div className="container" style={{ padding: '2.5rem 1.5rem' }}>
@@ -78,18 +85,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>RESUME SCORE</p>
-              <h2 style={{ fontSize: '2.2rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{resumeScore}<span style={{ fontSize: '1.1rem', color: '#94A3B8' }}>/100</span></h2>
+              <h2 style={{ fontSize: '2.2rem', color: resumeCompleted ? '#1E3A5F' : '#94A3B8', marginTop: '0.2rem' }}>
+                {resumeCompleted ? resumeScore : 0}<span style={{ fontSize: '1.1rem', color: '#94A3B8' }}>/100</span>
+              </h2>
             </div>
-            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: resumeCompleted ? '#E0F2FE' : '#F1F5F9', color: resumeCompleted ? '#0284C7' : '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <FileText size={22} />
             </div>
           </div>
           <div className="progress-bar" style={{ marginBottom: '0.75rem' }}>
-            <div className="progress-fill" style={{ width: `${resumeScore}%`, background: '#0284C7' }}></div>
+            <div className="progress-fill" style={{ width: `${resumeCompleted ? resumeScore : 0}%`, background: resumeCompleted ? '#0284C7' : '#CBD5E1' }}></div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Extracted Skills</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('resume')}>View</button>
+            <span style={{ fontSize: '0.8rem', color: resumeCompleted ? '#16A34A' : '#64748B', fontWeight: resumeCompleted ? '700' : '400' }}>
+              {resumeCompleted ? '✓ Resume Analyzed' : 'Pending Resume Upload'}
+            </span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('resume')}>
+              {resumeCompleted ? 'View Analysis' : 'Upload Resume'}
+            </button>
           </div>
         </div>
 
@@ -98,18 +111,24 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>JOB MATCH FIT</p>
-              <h2 style={{ fontSize: '2.2rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{jobMatchScore}%</h2>
+              <h2 style={{ fontSize: '2.2rem', color: jobMatchCompleted ? '#1E3A5F' : '#94A3B8', marginTop: '0.2rem' }}>
+                {jobMatchCompleted ? jobMatchScore : 0}%
+              </h2>
             </div>
-            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#F0FDF4', color: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: jobMatchCompleted ? '#F0FDF4' : '#F1F5F9', color: jobMatchCompleted ? '#16A34A' : '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Target size={22} />
             </div>
           </div>
           <div className="progress-bar" style={{ marginBottom: '0.75rem' }}>
-            <div className="progress-fill" style={{ width: `${jobMatchScore}%`, background: '#16A34A' }}></div>
+            <div className="progress-fill" style={{ width: `${jobMatchCompleted ? jobMatchScore : 0}%`, background: jobMatchCompleted ? '#16A34A' : '#CBD5E1' }}></div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Skill Alignment</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('job')}>Analyze</button>
+            <span style={{ fontSize: '0.8rem', color: jobMatchCompleted ? '#16A34A' : '#64748B', fontWeight: jobMatchCompleted ? '700' : '400' }}>
+              {jobMatchCompleted ? '✓ Job Fit Calculated' : 'Pending Job Analysis'}
+            </span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('job')}>
+              {jobMatchCompleted ? 'View Fit' : 'Analyze Fit'}
+            </button>
           </div>
         </div>
 
@@ -118,18 +137,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>APTITUDE READINESS</p>
-              <h2 style={{ fontSize: '2.2rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{aptitudeScore}<span style={{ fontSize: '1.1rem', color: '#94A3B8' }}>/100</span></h2>
+              <h2 style={{ fontSize: '2.2rem', color: aptitudeCompleted ? '#1E3A5F' : '#94A3B8', marginTop: '0.2rem' }}>
+                {aptitudeCompleted ? aptitudeScore : 0}<span style={{ fontSize: '1.1rem', color: '#94A3B8' }}>/100</span>
+              </h2>
             </div>
-            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#DCFCE7', color: '#15803D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: aptitudeCompleted ? '#DCFCE7' : '#F1F5F9', color: aptitudeCompleted ? '#15803D' : '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Activity size={22} />
             </div>
           </div>
           <div style={{ marginBottom: '0.75rem' }}>
-            <span className="badge badge-success" style={{ fontSize: '0.775rem' }}>Good Performance</span>
+            <span className={`badge ${aptitudeCompleted ? 'badge-success' : 'badge-neutral'}`} style={{ fontSize: '0.775rem' }}>
+              {aptitudeCompleted ? (aptitudeScore >= 80 ? 'Excellent' : 'Good Performance') : 'Not Attempted'}
+            </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.775rem', color: '#64748B' }}>Last: {lastAptitudeDate || '13 Aug 2026'} (Best: {bestAptitudeScore}%)</span>
-            <button className="btn btn-action btn-sm" onClick={() => onNavigate('aptitude')}>Take Test</button>
+            <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+              {aptitudeCompleted ? `Last: ${lastAptitudeDate || 'Recently'} (Best: ${bestAptitudeScore}%)` : 'No test completed yet'}
+            </span>
+            <button className="btn btn-action btn-sm" onClick={() => onNavigate('aptitude')}>
+              {aptitudeCompleted ? 'Retake Test' : 'Take Test'}
+            </button>
           </div>
         </div>
 
@@ -138,18 +165,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>CAREER READINESS</p>
-              <h2 style={{ fontSize: '2.2rem', color: '#1E3A5F', marginTop: '0.2rem' }}>{readinessScore}%</h2>
+              <h2 style={{ fontSize: '2.2rem', color: completedCount > 0 ? '#1E3A5F' : '#94A3B8', marginTop: '0.2rem' }}>
+                {completedCount > 0 ? readinessScore : 0}%
+              </h2>
             </div>
-            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: completedCount > 0 ? '#EFF6FF' : '#F1F5F9', color: completedCount > 0 ? '#2563EB' : '#94A3B8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Award size={22} />
             </div>
           </div>
           <div style={{ marginBottom: '0.75rem' }}>
-            <span className="badge badge-primary" style={{ fontSize: '0.775rem' }}>{readinessCategory}</span>
+            <span className={`badge ${completedCount > 0 ? 'badge-primary' : 'badge-neutral'}`} style={{ fontSize: '0.775rem' }}>
+              {readinessCategory}
+            </span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.775rem', color: '#64748B' }}>Combined Readiness Metric</span>
-            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('setup')}>Practice</button>
+            <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+              {completedCount > 0 ? `${completedCount} of 4 modules evaluated` : 'Complete modules to evaluate'}
+            </span>
+            <button className="btn btn-outline btn-sm" onClick={() => onNavigate('setup')}>
+              {completedCount > 0 ? 'Practice' : 'Get Started'}
+            </button>
           </div>
         </div>
       </div>

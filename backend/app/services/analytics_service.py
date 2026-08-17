@@ -21,52 +21,65 @@ class AnalyticsService:
     @staticmethod
     def get_candidate_dashboard(db: Session, candidate: CandidateProfile) -> Dict[str, Any]:
         """Aggregate Candidate Dashboard metrics with live database queries."""
-        # Latest resume score
+        # 1. Latest resume score
         latest_resume = db.query(Resume).filter(Resume.candidate_id == candidate.id).order_by(Resume.uploaded_at.desc()).first()
-        resume_score = latest_resume.analysis.overall_score if (latest_resume and latest_resume.analysis) else 78.0
+        resume_completed = bool(latest_resume and latest_resume.analysis and latest_resume.analysis.overall_score is not None)
+        resume_score = round(latest_resume.analysis.overall_score, 1) if resume_completed else 0.0
 
-        # Latest job match score
+        # 2. Latest job match score
         latest_match = db.query(JobMatchScore).join(Resume).filter(Resume.candidate_id == candidate.id).order_by(JobMatchScore.calculated_at.desc()).first()
-        job_match_score = latest_match.match_percentage if latest_match else 76.0
+        job_match_completed = bool(latest_match and latest_match.match_percentage is not None)
+        job_match_score = round(latest_match.match_percentage, 1) if job_match_completed else 0.0
 
-        # Latest interview score
+        # 3. Latest mock interview score
         interviews = db.query(Interview).filter(Interview.candidate_id == candidate.id).order_by(Interview.started_at.desc()).all()
         completed_interviews = [i for i in interviews if i.status == "COMPLETED" and i.score]
         total_completed = len(completed_interviews)
-        interview_score = completed_interviews[0].score.overall_score if completed_interviews else 82.0
+        interview_completed = total_completed > 0
+        interview_score = round(completed_interviews[0].score.overall_score, 1) if interview_completed else 0.0
 
-        # Aptitude Test Metrics
+        # 4. Aptitude Test Metrics
         apt_attempts = db.query(AptitudeTestAttempt).filter(
             AptitudeTestAttempt.candidate_id == candidate.id,
             AptitudeTestAttempt.status == "SUBMITTED"
         ).order_by(AptitudeTestAttempt.submitted_at.desc()).all()
 
         total_apt_completed = len(apt_attempts)
-        if apt_attempts:
+        aptitude_completed = total_apt_completed > 0
+        if aptitude_completed:
             latest_apt = apt_attempts[0]
-            aptitude_score = latest_apt.percentage
-            last_apt_date = latest_apt.submitted_at.strftime("%d %b %Y") if latest_apt.submitted_at else None
-            best_apt_score = max([a.percentage for a in apt_attempts])
+            aptitude_score = round(latest_apt.percentage, 1)
+            last_apt_date = latest_apt.submitted_at.strftime("%d %b %Y") if latest_apt.submitted_at else "Recently"
+            best_apt_score = round(max([a.percentage for a in apt_attempts]), 1)
         else:
-            aptitude_score = 76.0
-            last_apt_date = "13 Aug 2026"
-            best_apt_score = 82.0
+            aptitude_score = 0.0
+            last_apt_date = None
+            best_apt_score = 0.0
 
-        # Calculate Combined Career Readiness Score
-        # Formula: 25% Resume + 25% Job Match + 25% Mock Interview + 25% Aptitude Score
-        readiness_score = round(
-            (0.25 * resume_score) + (0.25 * job_match_score) + (0.25 * interview_score) + (0.25 * aptitude_score),
-            1
-        )
+        # Calculate Combined Career Readiness Score ONLY from completed parameters
+        completed_scores = []
+        if resume_completed:
+            completed_scores.append(resume_score)
+        if job_match_completed:
+            completed_scores.append(job_match_score)
+        if interview_completed:
+            completed_scores.append(interview_score)
+        if aptitude_completed:
+            completed_scores.append(aptitude_score)
 
-        if readiness_score >= 85:
-            category = "Interview Ready"
-        elif readiness_score >= 70:
-            category = "Good Performance"
-        elif readiness_score >= 60:
-            category = "Needs Improvement"
+        if completed_scores:
+            readiness_score = round(sum(completed_scores) / len(completed_scores), 1)
+            if readiness_score >= 85:
+                category = "Interview Ready"
+            elif readiness_score >= 70:
+                category = "Good Performance"
+            elif readiness_score >= 60:
+                category = "Needs Improvement"
+            else:
+                category = "Requires Preparation"
         else:
-            category = "Requires Preparation"
+            readiness_score = 0.0
+            category = "Pending Evaluation"
 
         # Top skill gaps
         gaps = db.query(SkillGap).filter(SkillGap.candidate_id == candidate.id).order_by(SkillGap.gap_percentage.desc()).limit(5).all()
@@ -88,15 +101,21 @@ class AnalyticsService:
             })
 
         return {
+            "resume_completed": resume_completed,
             "resume_score": resume_score,
+            "job_match_completed": job_match_completed,
             "job_match_score": job_match_score,
+            "interview_completed": interview_completed,
+            "interview_score": interview_score,
+            "aptitude_completed": aptitude_completed,
+            "aptitude_score": aptitude_score,
             "career_readiness_score": readiness_score,
             "readiness_category": category,
-            "aptitude_score": aptitude_score,
             "last_aptitude_date": last_apt_date,
             "best_aptitude_score": best_apt_score,
             "total_aptitude_tests_completed": total_apt_completed,
             "total_interviews_completed": total_completed,
+            "completed_parameters_count": len(completed_scores),
             "recent_interviews": interviews[:5],
             "top_skill_gaps": gaps,
             "active_preparation_plan": active_plan,

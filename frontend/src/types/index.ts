@@ -206,15 +206,21 @@ export interface PreparationPlan {
 }
 
 export interface DashboardMetrics {
+  resume_completed?: boolean;
   resume_score: number;
+  job_match_completed?: boolean;
   job_match_score: number;
+  interview_completed?: boolean;
+  interview_score?: number;
+  aptitude_completed?: boolean;
+  aptitude_score?: number;
   career_readiness_score: number;
   readiness_category: string;
-  aptitude_score?: number;
   last_aptitude_date?: string;
   best_aptitude_score?: number;
   total_aptitude_tests_completed?: number;
   total_interviews_completed: number;
+  completed_parameters_count?: number;
   recent_interviews: Interview[];
   top_skill_gaps: SkillGap[];
   active_preparation_plan?: PreparationPlan;
