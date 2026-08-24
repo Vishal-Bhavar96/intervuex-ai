@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, UserPlus, Key, Mail, User, Eye, EyeOff, CheckCircle, AlertCircle, X, Sparkles, Lock, ShieldCheck } from 'lucide-react';
+import { 
+  LogIn, UserPlus, Key, Mail, User, Eye, EyeOff, CheckCircle2, 
+  AlertCircle, X, Sparkles, Lock, ArrowRight, ShieldCheck, Zap,
+  Check
+} from 'lucide-react';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -16,6 +20,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   // Registration Extra States
   const [fullName, setFullName] = useState('');
@@ -38,10 +43,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
     const hasMinLength = pwd.length >= 8;
     const hasLetter = /[a-zA-Z]/.test(pwd);
     const hasNumber = /[0-9]/.test(pwd);
-    return { hasMinLength, hasLetter, hasNumber, isValid: hasMinLength && hasLetter && hasNumber };
+    const score = (hasMinLength ? 1 : 0) + (hasLetter ? 1 : 0) + (hasNumber ? 1 : 0);
+    return { hasMinLength, hasLetter, hasNumber, score, isValid: hasMinLength && hasLetter && hasNumber };
   };
 
   const pwdValidation = validatePasswordRules(password);
+
+  const fillQuickDemo = (demoType: 'candidate' | 'admin') => {
+    setError('');
+    setEmailError('');
+    setPasswordError('');
+    setAuthMode('login');
+    if (demoType === 'candidate') {
+      setEmail('candidate@intervuex.com');
+      setPassword('password123');
+    } else {
+      setEmail('admin@intervuex.com');
+      setPassword('admin123');
+    }
+  };
 
   const validateLoginForm = () => {
     let isValid = true;
@@ -80,7 +100,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
     } catch (err: any) {
       const msg = err.message || '';
       if (msg.toLowerCase().includes('401') || msg.toLowerCase().includes('credential') || msg.toLowerCase().includes('incorrect')) {
-        setError('Incorrect email address or password. Please verify your credentials or register a new account.');
+        setError('Incorrect email or password. Please verify your credentials or register a new account.');
       } else {
         setError(msg || 'Authentication failed. Please check your credentials and try again.');
       }
@@ -110,10 +130,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
     setLoading(true);
     try {
       await register(email.trim(), password, fullName.trim(), 'CANDIDATE');
-      setSuccessMsg('Account created successfully! Signing in...');
+      setSuccessMsg('Account created successfully! Launching your candidate workspace...');
       setTimeout(() => {
         onSuccess();
-      }, 500);
+      }, 600);
     } catch (err: any) {
       setError(err.message || 'Registration failed. An account with this email may already exist.');
     } finally {
@@ -140,65 +160,110 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
   };
 
   return (
-    <div style={{ minHeight: 'calc(100vh - 70px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1rem', background: '#F8FAFC' }}>
-      <div style={{ maxWidth: '1020px', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '2.5rem', alignItems: 'stretch' }}>
+    <div style={{
+      minHeight: 'calc(100vh - 70px)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '3rem 1.25rem',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+
+      {/* Creative Ambient Background Glow Orbs */}
+      <div style={{
+        position: 'absolute',
+        top: '15%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '600px',
+        height: '350px',
+        background: 'radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.05) 50%, transparent 70%)',
+        filter: 'blur(60px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
+      <div style={{
+        position: 'absolute',
+        bottom: '10%',
+        right: '15%',
+        width: '400px',
+        height: '280px',
+        background: 'radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 60%)',
+        filter: 'blur(50px)',
+        zIndex: 0,
+        pointerEvents: 'none'
+      }} />
+
+      {/* Main Centered Auth Container */}
+      <div style={{ width: '100%', maxWidth: '480px', position: 'relative', zIndex: 1 }}>
         
-        {/* Left Side Panel: Software Engineering Branding */}
-        <div style={{ 
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)', 
-          color: '#FFFFFF', 
-          padding: '2.5rem', 
-          borderRadius: '20px', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          justifyContent: 'space-between',
-          border: '1px solid #334155',
-          boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.3)'
-        }}>
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(37, 99, 235, 0.2)', color: '#60A5FA', padding: '0.4rem 0.85rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '800', letterSpacing: '0.06em', marginBottom: '1.75rem', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
-              <Sparkles size={14} /> INTERVUEX AI PLATFORM
-            </div>
-
-            <h1 style={{ fontSize: '2.4rem', fontWeight: '800', lineHeight: 1.15, color: '#FFFFFF', marginBottom: '1rem' }}>
-              Software Engineering<br />
-              Placement & Interview<br />
-              <span style={{ color: '#3B82F6' }}>Readiness Platform</span>
-            </h1>
-
-            <p style={{ fontSize: '0.95rem', color: '#94A3B8', lineHeight: 1.6, marginBottom: '2rem' }}>
-              Structured MNC aptitude assessments, automated resume ATS parsing, and adaptive AI mock interviews tailored for software candidates.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {[
-                { title: 'Resume ATS & Skill Extraction', desc: 'Analyzes technical stack, experience, and candidate projects.' },
-                { title: 'Realistic AI Interviewer Engine', desc: 'Adaptive technical questioning based on candidate profile.' },
-                { title: 'Placement Aptitude Proctored Tests', desc: 'MNC quantitative, logical, and technical practice suites.' }
-              ].map((feat, idx) => (
-                <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.2)', color: '#60A5FA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                    <ShieldCheck size={16} />
-                  </div>
-                  <div>
-                    <strong style={{ fontSize: '0.9rem', color: '#F8FAFC', display: 'block' }}>{feat.title}</strong>
-                    <span style={{ fontSize: '0.8rem', color: '#94A3B8' }}>{feat.desc}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Creative Top Branding Pill */}
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'var(--soft-blue)',
+            color: 'var(--primary-blue)',
+            padding: '0.4rem 0.95rem',
+            borderRadius: '9999px',
+            fontSize: '0.78rem',
+            fontWeight: 700,
+            letterSpacing: '0.04em',
+            border: '1px solid rgba(37, 99, 235, 0.2)',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.1)',
+            marginBottom: '1rem'
+          }}>
+            <Sparkles size={14} /> AI-POWERED CAREER READINESS
           </div>
 
-          <div style={{ marginTop: '2.5rem', paddingTop: '1.25rem', borderTop: '1px solid #334155', fontSize: '0.775rem', color: '#94A3B8' }}>
-            🔒 Secured with Enterprise JWT & Encrypted Password Hashing
-          </div>
+          <h1 style={{
+            fontSize: '2rem',
+            fontWeight: 800,
+            color: 'var(--main-heading)',
+            letterSpacing: '-0.03em',
+            margin: '0 0 0.4rem 0'
+          }}>
+            {authMode === 'login' ? 'Welcome to IntervueX' : 'Create Your Account'}
+          </h1>
+          
+          <p style={{
+            fontSize: '0.925rem',
+            color: 'var(--secondary-text)',
+            margin: 0
+          }}>
+            {authMode === 'login' 
+              ? 'Sign in to access your AI mock interviews & aptitude tests' 
+              : 'Start practicing with adaptive AI mock interviews today'}
+          </p>
         </div>
 
-        {/* Right Side Panel: Clean Software Design Auth Card */}
-        <div className="card" style={{ padding: '2.25rem', borderRadius: '20px', border: '1px solid #E2E8F0', background: '#FFFFFF', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          
-          {/* Mode Switcher Tabs (Sign In vs Register) */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', background: '#F1F5F9', padding: '0.3rem', borderRadius: '10px', marginBottom: '1.75rem' }}>
+        {/* Auth Card */}
+        <div 
+          className="card" 
+          style={{
+            padding: '2.25rem',
+            borderRadius: '20px',
+            border: '1px solid var(--primary-border)',
+            background: 'var(--bg-card)',
+            boxShadow: 'var(--shadow-md)',
+            backdropFilter: 'blur(10px)',
+            position: 'relative'
+          }}
+        >
+          {/* Segmented Mode Switcher */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            background: 'var(--bg-card-subtle)',
+            padding: '0.35rem',
+            borderRadius: '12px',
+            marginBottom: '1.75rem',
+            border: '1px solid var(--primary-border)'
+          }}>
             <button
               type="button"
               onClick={() => {
@@ -208,19 +273,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
               }}
               style={{
                 padding: '0.65rem',
-                borderRadius: '8px',
+                borderRadius: '9px',
                 border: 'none',
-                background: authMode === 'login' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'login' ? '#1E3A5F' : '#64748B',
-                fontWeight: '700',
+                background: authMode === 'login' ? 'var(--bg-card)' : 'transparent',
+                color: authMode === 'login' ? 'var(--primary-blue)' : 'var(--secondary-text)',
+                fontWeight: 700,
                 fontSize: '0.9rem',
                 cursor: 'pointer',
-                boxShadow: authMode === 'login' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                boxShadow: authMode === 'login' ? '0 2px 6px rgba(0, 0, 0, 0.08)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem',
-                transition: 'all 0.2s'
+                gap: '0.45rem',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               <LogIn size={16} /> Sign In
@@ -234,59 +299,132 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
               }}
               style={{
                 padding: '0.65rem',
-                borderRadius: '8px',
+                borderRadius: '9px',
                 border: 'none',
-                background: authMode === 'register' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'register' ? '#1E3A5F' : '#64748B',
-                fontWeight: '700',
+                background: authMode === 'register' ? 'var(--bg-card)' : 'transparent',
+                color: authMode === 'register' ? 'var(--primary-blue)' : 'var(--secondary-text)',
+                fontWeight: 700,
                 fontSize: '0.9rem',
                 cursor: 'pointer',
-                boxShadow: authMode === 'register' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                boxShadow: authMode === 'register' ? '0 2px 6px rgba(0, 0, 0, 0.08)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.4rem',
-                transition: 'all 0.2s'
+                gap: '0.45rem',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
             >
               <UserPlus size={16} /> Register
             </button>
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.5rem', color: '#0F172A', fontWeight: '800' }}>
-              {authMode === 'login' ? 'Candidate Sign In' : 'Create Candidate Account'}
-            </h2>
-            <p style={{ fontSize: '0.875rem', color: '#64748B', marginTop: '0.2rem' }}>
-              {authMode === 'login' ? 'Enter your registered email and password to access your workspace.' : 'Fill in your details to start practicing AI interviews.'}
-            </p>
-          </div>
+          {/* Quick Demo Credentials Bar (Sign In Mode Only) */}
+          {authMode === 'login' && (
+            <div style={{
+              background: 'var(--soft-blue)',
+              border: '1px dashed rgba(37, 99, 235, 0.3)',
+              borderRadius: '10px',
+              padding: '0.75rem 0.9rem',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.5rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--primary-blue)', fontWeight: 700 }}>
+                <Zap size={14} /> Quick Demo:
+              </div>
+              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                <button
+                  type="button"
+                  onClick={() => fillQuickDemo('candidate')}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--primary-border)',
+                    color: 'var(--main-heading)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#2563EB'; e.currentTarget.style.color = '#2563EB'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--primary-border)'; e.currentTarget.style.color = 'var(--main-heading)'; }}
+                >
+                  Candidate
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fillQuickDemo('admin')}
+                  style={{
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--primary-border)',
+                    color: 'var(--main-heading)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    padding: '0.25rem 0.65rem',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#2563EB'; e.currentTarget.style.color = '#2563EB'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--primary-border)'; e.currentTarget.style.color = 'var(--main-heading)'; }}
+                >
+                  Admin
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Feedback Messages */}
           {error && (
-            <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', padding: '0.85rem 1rem', borderRadius: '10px', fontSize: '0.875rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+            <div style={{
+              background: 'var(--danger-bg)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: 'var(--danger)',
+              padding: '0.85rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.875rem',
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.65rem'
+            }}>
               <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <div style={{ fontWeight: '700', marginBottom: '2px' }}>Authentication Error</div>
+                <div style={{ fontWeight: 700, marginBottom: '2px' }}>Authentication Error</div>
                 <div>{error}</div>
               </div>
             </div>
           )}
 
           {successMsg && (
-            <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', color: '#15803D', padding: '0.85rem 1rem', borderRadius: '10px', fontSize: '0.875rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <CheckCircle size={18} style={{ flexShrink: 0 }} />
-              <div style={{ fontWeight: '700' }}>{successMsg}</div>
+            <div style={{
+              background: 'var(--success-bg)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              color: 'var(--success)',
+              padding: '0.85rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.875rem',
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem'
+            }}>
+              <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
+              <div style={{ fontWeight: 700 }}>{successMsg}</div>
             </div>
           )}
 
-          {/* LOGIN FORM */}
+          {/* SIGN IN FORM */}
           {authMode === 'login' ? (
             <form onSubmit={handleLoginSubmit} noValidate>
               <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                 <label className="form-label">Email Address</label>
                 <div style={{ position: 'relative' }}>
-                  <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailError ? '#EF4444' : '#94A3B8' }} />
+                  <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: emailError ? '#EF4444' : 'var(--placeholder)' }} />
                   <input 
                     type="email" 
                     className="form-input" 
@@ -301,13 +439,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                   />
                 </div>
                 {emailError && (
-                  <div style={{ color: '#DC2626', fontSize: '0.8rem', marginTop: '0.35rem', fontWeight: '500' }}>
+                  <div style={{ color: '#DC2626', fontSize: '0.8rem', marginTop: '0.35rem', fontWeight: 500 }}>
                     ⚠ {emailError}
                   </div>
                 )}
               </div>
 
-              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <div className="form-group" style={{ marginBottom: '1.35rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
                   <label className="form-label" style={{ marginBottom: 0 }}>Password</label>
                   <button 
@@ -318,14 +456,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                       setForgotSuccess('');
                       setShowForgotModal(true);
                     }}
-                    style={{ background: 'none', border: 'none', color: '#2563EB', fontSize: '0.825rem', fontWeight: '600', cursor: 'pointer', padding: 0 }}
+                    style={{ background: 'none', border: 'none', color: '#2563EB', fontSize: '0.825rem', fontWeight: 600, cursor: 'pointer', padding: 0 }}
                   >
                     Forgot Password?
                   </button>
                 </div>
 
                 <div style={{ position: 'relative' }}>
-                  <Key size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passwordError ? '#EF4444' : '#94A3B8' }} />
+                  <Key size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: passwordError ? '#EF4444' : 'var(--placeholder)' }} />
                   <input 
                     type={showPassword ? 'text' : 'password'} 
                     className="form-input" 
@@ -341,35 +479,65 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--secondary-text)', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     title={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {passwordError && (
-                  <div style={{ color: '#DC2626', fontSize: '0.8rem', marginTop: '0.35rem', fontWeight: '500' }}>
+                  <div style={{ color: '#DC2626', fontSize: '0.8rem', marginTop: '0.35rem', fontWeight: 500 }}>
                     ⚠ {passwordError}
                   </div>
                 )}
               </div>
 
-              <button type="submit" className="btn btn-action" style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', fontWeight: '700' }} disabled={loading}>
-                {loading ? 'Authenticating...' : 'Sign In'}
+              {/* Remember Me Checkbox */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', marginBottom: '1.5rem' }}>
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: '#2563EB', cursor: 'pointer' }}
+                />
+                <label htmlFor="rememberMe" style={{ fontSize: '0.85rem', color: 'var(--secondary-text)', cursor: 'pointer', userSelect: 'none' }}>
+                  Remember this device for 30 days
+                </label>
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn btn-action" 
+                style={{ 
+                  width: '100%', 
+                  padding: '0.8rem', 
+                  fontSize: '1rem', 
+                  fontWeight: 700, 
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)' 
+                }} 
+                disabled={loading}
+              >
+                {loading ? 'Authenticating...' : (
+                  <>
+                    Sign In to Workspace <ArrowRight size={18} />
+                  </>
+                )}
               </button>
             </form>
           ) : (
             /* REGISTER FORM */
             <form onSubmit={handleRegisterSubmit} noValidate>
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+              <div className="form-group" style={{ marginBottom: '1.2rem' }}>
                 <label className="form-label">Full Name</label>
                 <div style={{ position: 'relative' }}>
-                  <User size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                  <User size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--placeholder)' }} />
                   <input 
                     type="text" 
                     className="form-input" 
                     style={{ paddingLeft: '2.6rem' }}
-                    placeholder="e.g. Sagar Candidate"
+                    placeholder="e.g. Alex Candidate"
                     value={fullName} 
                     onChange={(e) => setFullName(e.target.value)} 
                     required 
@@ -377,15 +545,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+              <div className="form-group" style={{ marginBottom: '1.2rem' }}>
                 <label className="form-label">Email Address</label>
                 <div style={{ position: 'relative' }}>
-                  <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                  <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--placeholder)' }} />
                   <input 
                     type="email" 
                     className="form-input" 
                     style={{ paddingLeft: '2.6rem' }}
-                    placeholder="sagar@example.com"
+                    placeholder="alex@example.com"
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
                     required 
@@ -393,15 +561,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                <label className="form-label">Password</label>
+              <div className="form-group" style={{ marginBottom: '1.35rem' }}>
+                <label className="form-label">Create Password</label>
                 <div style={{ position: 'relative' }}>
-                  <Key size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                  <Key size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--placeholder)' }} />
                   <input 
                     type={showPassword ? 'text' : 'password'} 
                     className="form-input" 
                     style={{ paddingLeft: '2.6rem', paddingRight: '2.6rem' }}
-                    placeholder="At least 8 characters"
+                    placeholder="Min. 8 characters (letters & numbers)"
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
                     required 
@@ -409,85 +577,251 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', padding: '4px' }}
+                    style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--secondary-text)', padding: '4px' }}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+
+                {/* Live Password Strength Indicator */}
+                {password.length > 0 && (
+                  <div style={{ marginTop: '0.6rem' }}>
+                    <div style={{ display: 'flex', gap: '4px', marginBottom: '0.35rem' }}>
+                      <div style={{ height: '4px', flex: 1, borderRadius: '2px', background: pwdValidation.score >= 1 ? '#EF4444' : 'var(--primary-border)' }} />
+                      <div style={{ height: '4px', flex: 1, borderRadius: '2px', background: pwdValidation.score >= 2 ? '#F59E0B' : 'var(--primary-border)' }} />
+                      <div style={{ height: '4px', flex: 1, borderRadius: '2px', background: pwdValidation.score >= 3 ? '#10B981' : 'var(--primary-border)' }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--secondary-text)' }}>
+                      <span>8+ chars {pwdValidation.hasMinLength ? '✓' : '•'}</span>
+                      <span>Letters {pwdValidation.hasLetter ? '✓' : '•'}</span>
+                      <span>Numbers {pwdValidation.hasNumber ? '✓' : '•'}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <button type="submit" className="btn btn-action" style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', fontWeight: '700' }} disabled={loading}>
-                {loading ? 'Creating Account...' : 'Register & Create Account'}
+              <button 
+                type="submit" 
+                className="btn btn-action" 
+                style={{ 
+                  width: '100%', 
+                  padding: '0.8rem', 
+                  fontSize: '1rem', 
+                  fontWeight: 700, 
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)' 
+                }} 
+                disabled={loading}
+              >
+                {loading ? 'Creating Workspace...' : (
+                  <>
+                    Create Candidate Account <ArrowRight size={18} />
+                  </>
+                )}
               </button>
             </form>
           )}
 
-          <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#64748B' }}>
+          {/* Card Footer Switcher */}
+          <div style={{
+            marginTop: '1.75rem',
+            paddingTop: '1.25rem',
+            borderTop: '1px solid var(--primary-border)',
+            textAlign: 'center',
+            fontSize: '0.875rem',
+            color: 'var(--secondary-text)'
+          }}>
             {authMode === 'login' ? (
               <>
-                New to IntervueX?{' '}
-                <span onClick={() => { setAuthMode('register'); setError(''); }} style={{ color: '#2563EB', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Register account
-                </span>
+                New candidate on IntervueX?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('register'); setError(''); }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#2563EB',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    padding: 0,
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Create account
+                </button>
               </>
             ) : (
               <>
-                Already registered?{' '}
-                <span onClick={() => { setAuthMode('login'); setError(''); }} style={{ color: '#2563EB', fontWeight: '700', cursor: 'pointer', textDecoration: 'underline' }}>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('login'); setError(''); }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#2563EB',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    padding: 0,
+                    textDecoration: 'underline'
+                  }}
+                >
                   Sign in here
-                </span>
+                </button>
               </>
             )}
           </div>
         </div>
+
+        {/* Creative Micro-Feature Chips Below Card */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '0.65rem',
+          marginTop: '1.75rem',
+          padding: '0 0.5rem'
+        }}>
+          {[
+            'MNC Aptitude Suites',
+            'Adaptive AI Interviews',
+            'ATS Resume Scoring',
+            'Python Sandbox'
+          ].map((item, i) => (
+            <span
+              key={i}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.76rem',
+                fontWeight: 600,
+                color: 'var(--secondary-text)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--primary-border)',
+                padding: '0.3rem 0.65rem',
+                borderRadius: '9999px',
+                boxShadow: 'var(--shadow-subtle)'
+              }}
+            >
+              <Check size={12} color="#22C55E" strokeWidth={3} /> {item}
+            </span>
+          ))}
+        </div>
+
       </div>
 
       {/* Forgot Password Modal */}
       {showForgotModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
-          <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '1.75rem', borderRadius: '16px', position: 'relative' }}>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(6px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '1rem'
+        }}>
+          <div className="card" style={{
+            width: '100%',
+            maxWidth: '440px',
+            padding: '2rem',
+            borderRadius: '20px',
+            position: 'relative',
+            border: '1px solid var(--primary-border)',
+            background: 'var(--bg-card)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
+          }}>
             <button 
               onClick={() => setShowForgotModal(false)}
-              style={{ position: 'absolute', right: '16px', top: '16px', background: 'none', border: 'none', color: '#64748B', cursor: 'pointer' }}
+              style={{
+                position: 'absolute',
+                right: '18px',
+                top: '18px',
+                background: 'none',
+                border: 'none',
+                color: 'var(--secondary-text)',
+                cursor: 'pointer',
+                display: 'flex',
+                padding: '4px'
+              }}
             >
               <X size={20} />
             </button>
 
-            <div style={{ marginBottom: '1.25rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#EFF6FF', color: '#2563EB', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '0.75rem' }}>
-                <Lock size={20} />
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '12px',
+                background: 'var(--soft-blue)',
+                color: 'var(--primary-blue)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '0.85rem'
+              }}>
+                <Lock size={22} />
               </div>
-              <h3 style={{ fontSize: '1.25rem' }}>Reset Password</h3>
-              <p style={{ fontSize: '0.875rem', color: '#64748B', marginTop: '0.25rem' }}>
-                Enter your email address to receive password reset instructions.
+              <h3 style={{ fontSize: '1.3rem', color: 'var(--main-heading)', margin: 0 }}>Reset Password</h3>
+              <p style={{ fontSize: '0.875rem', color: 'var(--secondary-text)', marginTop: '0.35rem' }}>
+                Enter your registered email address to receive secure reset instructions.
               </p>
             </div>
 
             {forgotError && (
-              <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#B91C1C', padding: '0.65rem 0.85rem', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem' }}>
+              <div style={{
+                background: 'var(--danger-bg)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                color: 'var(--danger)',
+                padding: '0.75rem 0.9rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                marginBottom: '1rem'
+              }}>
                 ⚠ {forgotError}
               </div>
             )}
 
             {forgotSuccess ? (
               <div>
-                <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', color: '#166534', padding: '0.85rem', borderRadius: '8px', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
-                  ✓ {forgotSuccess}
+                <div style={{
+                  background: 'var(--success-bg)',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                  color: 'var(--success)',
+                  padding: '0.95rem',
+                  borderRadius: '10px',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <CheckCircle2 size={18} /> {forgotSuccess}
                 </div>
-                <button className="btn btn-outline" style={{ width: '100%' }} onClick={() => setShowForgotModal(false)}>
-                  Close
+                <button 
+                  className="btn btn-outline" 
+                  style={{ width: '100%', borderRadius: '10px' }} 
+                  onClick={() => setShowForgotModal(false)}
+                >
+                  Back to Sign In
                 </button>
               </div>
             ) : (
               <form onSubmit={handleForgotSubmit}>
-                <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+                <div className="form-group" style={{ marginBottom: '1.35rem' }}>
                   <label className="form-label">Email Address</label>
                   <div style={{ position: 'relative' }}>
-                    <Mail size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+                    <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--placeholder)' }} />
                     <input 
                       type="email" 
                       className="form-input" 
-                      style={{ paddingLeft: '2.4rem' }}
+                      style={{ paddingLeft: '2.6rem' }}
                       placeholder="name@example.com"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
@@ -497,10 +831,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
-                  <button type="button" className="btn btn-outline" onClick={() => setShowForgotModal(false)}>
+                  <button 
+                    type="button" 
+                    className="btn btn-outline" 
+                    style={{ borderRadius: '8px' }}
+                    onClick={() => setShowForgotModal(false)}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-action" disabled={forgotLoading}>
+                  <button 
+                    type="submit" 
+                    className="btn btn-action" 
+                    style={{ borderRadius: '8px' }}
+                    disabled={forgotLoading}
+                  >
                     {forgotLoading ? 'Sending...' : 'Send Reset Link'}
                   </button>
                 </div>
