@@ -259,67 +259,32 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 4. RECENT INTERVIEWS + SKILL GAPS (Sections 12 & 13) */}
-      <div className="grid grid-2 gap-6" style={{ marginBottom: '2rem' }}>
-        
-        {/* Recent AI Interview Sessions (Section 12) */}
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#EFF6FF', color: '#1E3A5F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Activity size={18} />
+      {/* 4. IDENTIFIED SKILL GAPS & WEAK AREAS */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div className="card" style={{ padding: '1.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--warning-bg)', color: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <AlertTriangle size={19} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--main-heading)', margin: 0 }}>Identified Skill Gaps & Weak Areas</h3>
+                <p style={{ fontSize: '0.825rem', color: 'var(--secondary-text)', margin: '0.15rem 0 0 0' }}>Automated gap analysis generated from candidate assessments & resume evaluations.</p>
+              </div>
             </div>
-            <h3 style={{ fontSize: '1.1rem', color: '#0F172A' }}>Recent AI Interview Sessions</h3>
-          </div>
-
-          {metrics?.recent_interviews && metrics.recent_interviews.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {metrics.recent_interviews.map((item) => (
-                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.85rem 1rem', border: '1px solid #E2E8F0', borderRadius: '8px', background: '#FFFFFF' }}>
-                  <div>
-                    <strong style={{ color: '#0F172A', fontSize: '0.9rem', display: 'block' }}>{item.type} Interview</strong>
-                    <span style={{ fontSize: '0.775rem', color: '#64748B' }}>
-                      {item.started_at ? new Date(item.started_at).toLocaleDateString() : 'Recent'} • {item.difficulty || 'Medium'} Mode
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <span className="badge badge-success" style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                      {item.score?.overall_score ? `${item.score.overall_score}%` : 'Completed'}
-                    </span>
-                    <button 
-                      className="btn btn-outline btn-sm" 
-                      onClick={() => onNavigate('result', item.id)}
-                    >
-                      View Result
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ padding: '2rem 1.5rem', textAlign: 'center', background: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
-              <p style={{ marginBottom: '1rem', color: '#64748B', fontSize: '0.875rem' }}>No completed mock interviews recorded yet.</p>
-              <button className="btn btn-action btn-sm" onClick={() => onNavigate('setup')}>
-                <PlayCircle size={15} /> Start Mock Interview
+            {metrics?.top_skill_gaps && metrics.top_skill_gaps.length > 0 && (
+              <button className="btn btn-outline btn-sm" onClick={() => onNavigate('roadmap')}>
+                View 4-Week Roadmap <ArrowRight size={14} />
               </button>
-            </div>
-          )}
-        </div>
-
-        {/* Identified Skill Gaps & Weak Areas (Section 13) */}
-        <div className="card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '1.25rem' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#FFFBEB', color: '#B45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <AlertTriangle size={18} />
-            </div>
-            <h3 style={{ fontSize: '1.1rem', color: '#0F172A' }}>Identified Skill Gaps & Weak Areas</h3>
+            )}
           </div>
 
           {metrics?.top_skill_gaps && metrics.top_skill_gaps.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            <div className="grid grid-2 gap-4">
               {metrics.top_skill_gaps.map((gap) => (
-                <div key={gap.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
-                    <strong style={{ color: '#0F172A' }}>{gap.skill_name}</strong>
+                <div key={gap.id} style={{ background: 'var(--bg-card-subtle)', padding: '1rem 1.2rem', borderRadius: '10px', border: '1px solid var(--primary-border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '0.4rem' }}>
+                    <strong style={{ color: 'var(--main-heading)' }}>{gap.skill_name}</strong>
                     <span className="badge badge-warning" style={{ fontSize: '0.725rem' }}>
                       Gap: {gap.gap_percentage.toFixed(0)}%
                     </span>
@@ -329,17 +294,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
                   </div>
                 </div>
               ))}
-              <button className="btn btn-outline btn-sm" onClick={() => onNavigate('roadmap')} style={{ marginTop: '0.5rem', alignSelf: 'flex-start' }}>
-                View Preparation Roadmap <ArrowRight size={14} />
-              </button>
             </div>
           ) : (
-            <div style={{ padding: '1.5rem', background: '#F8FAFC', borderRadius: '8px', color: '#64748B', fontSize: '0.875rem' }}>
-              Complete a mock interview or resume analysis to generate automated skill gap analysis and weak area identification.
+            <div style={{ padding: '1.75rem', background: 'var(--bg-card-subtle)', borderRadius: '10px', color: 'var(--secondary-text)', fontSize: '0.875rem', textAlign: 'center', border: '1px dashed var(--primary-border)' }}>
+              Complete an aptitude test, resume analysis, or mock interview to generate automated skill gap analysis and weak area identification.
             </div>
           )}
         </div>
-
       </div>
 
       {/* 5. CAREER READINESS BREAKDOWN (Section 15) */}

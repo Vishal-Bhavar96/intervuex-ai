@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ThemeToggle } from '../ThemeToggle';
 import { 
   Briefcase, User as UserIcon, FileText, Target, PlayCircle, 
-  BarChart2, Shield, LogOut, Code, Map, ChevronDown
+  BarChart2, Shield, LogOut, Code, Map, ChevronDown, History
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -34,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   }, []);
 
   const isCareerActive = ['resume', 'job', 'roadmap'].includes(activeTab);
-  const isPracticeActive = ['setup', 'live', 'coding', 'aptitude', 'aptitude_landing', 'aptitude_test', 'aptitude_result', 'aptitude_history'].includes(activeTab);
+  const isPracticeActive = ['setup', 'live', 'coding', 'history', 'result', 'aptitude', 'aptitude_landing', 'aptitude_test', 'aptitude_result', 'aptitude_history'].includes(activeTab);
 
   const getNavBtnClass = (isActive: boolean) => 
     `nav-item-btn ${isActive ? 'nav-item-btn-active' : ''}`;
@@ -148,7 +148,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                 <div className="nav-dropdown-menu" style={{
                   position: 'absolute', top: '115%', left: 0, background: 'var(--bg-card)', border: '1px solid var(--primary-border)',
                   borderRadius: '10px', boxShadow: 'var(--shadow-md)', padding: '0.4rem',
-                  minWidth: '185px', display: 'flex', flexDirection: 'column', gap: '0.2rem', zIndex: 110
+                  minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '0.2rem', zIndex: 110
                 }}>
                   <button 
                     className="btn nav-dropdown-item"
@@ -163,6 +163,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
                     onClick={() => { setActiveTab('setup'); setPracticeOpen(false); }}
                   >
                     <PlayCircle size={15} color="#2563EB" /> Mock Interview
+                  </button>
+                  <button 
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'history' || activeTab === 'result' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'history' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    onClick={() => { setActiveTab('history'); setPracticeOpen(false); }}
+                  >
+                    <History size={15} color="#8B5CF6" /> Interview Sessions
                   </button>
                   <button 
                     className="btn nav-dropdown-item"
