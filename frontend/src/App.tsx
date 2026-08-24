@@ -177,12 +177,12 @@ const MainContent: React.FC = () => {
         )}
       </main>
 
-      {/* Corporate Footer (Hidden during focused examination mode) */}
+      {/* Footer */}
       {!isAssessmentTakingMode && (
-        <footer style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--primary-border)', padding: '1.75rem 0', marginTop: 'auto', textAlign: 'center', transition: 'background-color 0.25s ease, border-color 0.25s ease' }}>
+        <footer style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--primary-border)', padding: '1rem 0', marginTop: 'auto', textAlign: 'center', transition: 'background-color 0.25s ease, border-color 0.25s ease' }}>
           <div className="container">
-            <p style={{ color: 'var(--secondary-text)', fontSize: '0.875rem' }}>
-              IntervueX © 2026. Adaptive AI Interview & Career Readiness SaaS Platform. All Rights Reserved.
+            <p style={{ color: 'var(--secondary-text)', fontSize: '0.875rem', margin: 0 }}>
+              created by vb
             </p>
           </div>
         </footer>

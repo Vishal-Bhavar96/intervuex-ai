@@ -49,20 +49,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
 
   const pwdValidation = validatePasswordRules(password);
 
-  const fillQuickDemo = (demoType: 'candidate' | 'admin') => {
-    setError('');
-    setEmailError('');
-    setPasswordError('');
-    setAuthMode('login');
-    if (demoType === 'candidate') {
-      setEmail('candidate@intervuex.com');
-      setPassword('password123');
-    } else {
-      setEmail('admin@intervuex.com');
-      setPassword('admin123');
-    }
-  };
-
   const validateLoginForm = () => {
     let isValid = true;
     setEmailError('');
@@ -318,65 +304,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, initialMode = '
             </button>
           </div>
 
-          {/* Quick Demo Credentials Bar (Sign In Mode Only) */}
-          {authMode === 'login' && (
-            <div style={{
-              background: 'var(--soft-blue)',
-              border: '1px dashed rgba(37, 99, 235, 0.3)',
-              borderRadius: '10px',
-              padding: '0.75rem 0.9rem',
-              marginBottom: '1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: '0.5rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--primary-blue)', fontWeight: 700 }}>
-                <Zap size={14} /> Quick Demo:
-              </div>
-              <div style={{ display: 'flex', gap: '0.4rem' }}>
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('candidate')}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--primary-border)',
-                    color: 'var(--main-heading)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#2563EB'; e.currentTarget.style.color = '#2563EB'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--primary-border)'; e.currentTarget.style.color = 'var(--main-heading)'; }}
-                >
-                  Candidate
-                </button>
-                <button
-                  type="button"
-                  onClick={() => fillQuickDemo('admin')}
-                  style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--primary-border)',
-                    color: 'var(--main-heading)',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s'
-                  }}
-                  onMouseOver={(e) => { e.currentTarget.style.borderColor = '#2563EB'; e.currentTarget.style.color = '#2563EB'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--primary-border)'; e.currentTarget.style.color = 'var(--main-heading)'; }}
-                >
-                  Admin
-                </button>
-              </div>
-            </div>
-          )}
+
 
           {/* Feedback Messages */}
           {error && (
