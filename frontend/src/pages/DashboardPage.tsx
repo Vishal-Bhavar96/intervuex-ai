@@ -392,28 +392,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* 7. AI CAREER INSIGHT (Section 17) */}
-      <div 
-        style={{ 
-          background: '#EFF6FF', 
-          border: '1px solid #DBEAFE', 
-          borderRadius: '12px', 
-          padding: '1.25rem 1.5rem', 
-          display: 'flex', 
-          alignItems: 'flex-start', 
-          gap: '1rem' 
-        }}
-      >
-        <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: '#FFFFFF', color: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 1px 3px rgba(37, 99, 235, 0.1)' }}>
-          <Sparkles size={20} />
-        </div>
-        <div>
-          <strong style={{ fontSize: '0.95rem', color: '#1E3A5F', display: 'block', marginBottom: '0.2rem' }}>AI Career Insight</strong>
-          <p style={{ color: '#475569', fontSize: '0.875rem', margin: 0, lineHeight: 1.5 }}>
-            "Your technical interview performance is strong, but your verbal ability and SQL scores need improvement. Complete the recommended practice modules before your next mock interview."
-          </p>
-        </div>
-      </div>
+
 
     </div>
   );
