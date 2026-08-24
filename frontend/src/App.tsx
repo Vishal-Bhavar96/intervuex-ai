@@ -102,7 +102,7 @@ const MainContent: React.FC = () => {
   const isAssessmentTakingMode = activeTab === 'aptitude_test';
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F8FAFC' }}>
+    <div className="app-root-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg-main)', color: 'var(--body-text)', transition: 'background-color 0.25s ease, color 0.25s ease' }}>
       {!isAssessmentTakingMode && <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />}
 
       <main style={{ flex: 1 }}>
@@ -179,9 +179,9 @@ const MainContent: React.FC = () => {
 
       {/* Corporate Footer (Hidden during focused examination mode) */}
       {!isAssessmentTakingMode && (
-        <footer style={{ background: '#FFFFFF', borderTop: '1px solid #E2E8F0', padding: '1.75rem 0', marginTop: 'auto', textAlign: 'center' }}>
+        <footer style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--primary-border)', padding: '1.75rem 0', marginTop: 'auto', textAlign: 'center', transition: 'background-color 0.25s ease, border-color 0.25s ease' }}>
           <div className="container">
-            <p style={{ color: '#64748B', fontSize: '0.875rem' }}>
+            <p style={{ color: 'var(--secondary-text)', fontSize: '0.875rem' }}>
               IntervueX © 2026. Adaptive AI Interview & Career Readiness SaaS Platform. All Rights Reserved.
             </p>
           </div>
@@ -193,9 +193,11 @@ const MainContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <MainContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <MainContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 
