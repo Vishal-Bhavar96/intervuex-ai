@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { ThemeToggle } from '../ThemeToggle';
 import { 
   Briefcase, User as UserIcon, FileText, Target, PlayCircle, 
   BarChart2, Shield, LogOut, Code, Map, ChevronDown
@@ -35,23 +36,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
   const isCareerActive = ['resume', 'job', 'roadmap'].includes(activeTab);
   const isPracticeActive = ['setup', 'live', 'coding', 'aptitude', 'aptitude_landing', 'aptitude_test', 'aptitude_result', 'aptitude_history'].includes(activeTab);
 
-  const getNavBtnStyle = (isActive: boolean) => ({
-    background: isActive ? '#1E3A5F' : 'transparent',
-    color: isActive ? '#FFFFFF' : '#0F172A',
-    border: '1px solid ' + (isActive ? '#1E3A5F' : 'transparent'),
-    fontWeight: isActive ? ('700' as const) : ('600' as const),
-    padding: '0.5rem 0.95rem',
-    borderRadius: '8px',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.45rem',
-    cursor: 'pointer',
-    fontSize: '0.875rem',
-    transition: 'all 0.15s ease'
-  });
+  const getNavBtnClass = (isActive: boolean) => 
+    `nav-item-btn ${isActive ? 'nav-item-btn-active' : ''}`;
 
   return (
-    <header style={{ background: '#FFFFFF', borderBottom: '1px solid #E2E8F0', position: 'sticky', top: 0, zIndex: 100 }}>
+    <header className="navbar-header" style={{ background: 'var(--bg-header)', borderBottom: '1px solid var(--primary-border)', position: 'sticky', top: 0, zIndex: 100, transition: 'background-color 0.2s ease, border-color 0.2s ease' }}>
       <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '70px' }}>
         
         {/* Brand Logo */}
@@ -62,22 +51,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           <div style={{ 
             width: '36px', height: '36px', borderRadius: '8px', 
             background: '#2563EB', 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF' 
+            display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#FFFFFF',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)'
           }}>
             <Briefcase size={20} />
           </div>
           <div>
-            <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#1E3A5F', letterSpacing: '-0.02em', display: 'block', lineHeight: 1 }}>INTERVUEX</span>
-            <span style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: '700', letterSpacing: '0.06em', marginTop: '2px', display: 'block' }}>AI CAREER PLATFORM</span>
+            <span style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--main-heading)', letterSpacing: '-0.02em', display: 'block', lineHeight: 1 }}>INTERVUEX</span>
+            <span style={{ fontSize: '0.65rem', color: 'var(--secondary-text)', fontWeight: '700', letterSpacing: '0.06em', marginTop: '2px', display: 'block' }}>AI CAREER PLATFORM</span>
           </div>
         </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links & Controls */}
         {user ? (
           <nav style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             {/* Dashboard */}
             <button 
-              style={getNavBtnStyle(activeTab === 'dashboard')}
+              className={getNavBtnClass(activeTab === 'dashboard')}
               onClick={() => {
                 setActiveTab('dashboard');
                 setCareerOpen(false);
@@ -89,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
 
             {/* Profile */}
             <button 
-              style={getNavBtnStyle(activeTab === 'profile')}
+              className={getNavBtnClass(activeTab === 'profile')}
               onClick={() => {
                 setActiveTab('profile');
                 setCareerOpen(false);
@@ -102,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             {/* Career Dropdown */}
             <div ref={careerRef} style={{ position: 'relative' }}>
               <button 
-                style={getNavBtnStyle(isCareerActive)}
+                className={getNavBtnClass(isCareerActive)}
                 onClick={() => {
                   setCareerOpen(!careerOpen);
                   setPracticeOpen(false);
@@ -112,28 +102,28 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               </button>
 
               {careerOpen && (
-                <div style={{
-                  position: 'absolute', top: '115%', left: 0, background: '#FFFFFF', border: '1px solid #E2E8F0',
-                  borderRadius: '10px', boxShadow: '0 4px 12px rgba(15,23,42,0.08)', padding: '0.4rem',
+                <div className="nav-dropdown-menu" style={{
+                  position: 'absolute', top: '115%', left: 0, background: 'var(--bg-card)', border: '1px solid var(--primary-border)',
+                  borderRadius: '10px', boxShadow: 'var(--shadow-md)', padding: '0.4rem',
                   minWidth: '175px', display: 'flex', flexDirection: 'column', gap: '0.2rem', zIndex: 110
                 }}>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'resume' ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'resume' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'resume' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'resume' ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('resume'); setCareerOpen(false); }}
                   >
                     <FileText size={15} color="#2563EB" /> Resume
                   </button>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'job' ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'job' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'job' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'job' ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('job'); setCareerOpen(false); }}
                   >
                     <Target size={15} color="#15803D" /> Job Match
                   </button>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'roadmap' ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'roadmap' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'roadmap' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'roadmap' ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('roadmap'); setCareerOpen(false); }}
                   >
                     <Map size={15} color="#B45309" /> Roadmap
@@ -145,7 +135,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             {/* Practice Dropdown */}
             <div ref={practiceRef} style={{ position: 'relative' }}>
               <button 
-                style={getNavBtnStyle(isPracticeActive)}
+                className={getNavBtnClass(isPracticeActive)}
                 onClick={() => {
                   setPracticeOpen(!practiceOpen);
                   setCareerOpen(false);
@@ -155,28 +145,28 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               </button>
 
               {practiceOpen && (
-                <div style={{
-                  position: 'absolute', top: '115%', left: 0, background: '#FFFFFF', border: '1px solid #E2E8F0',
-                  borderRadius: '10px', boxShadow: '0 4px 12px rgba(15,23,42,0.08)', padding: '0.4rem',
+                <div className="nav-dropdown-menu" style={{
+                  position: 'absolute', top: '115%', left: 0, background: 'var(--bg-card)', border: '1px solid var(--primary-border)',
+                  borderRadius: '10px', boxShadow: 'var(--shadow-md)', padding: '0.4rem',
                   minWidth: '185px', display: 'flex', flexDirection: 'column', gap: '0.2rem', zIndex: 110
                 }}>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'aptitude' || activeTab.startsWith('aptitude_') ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('aptitude'); setPracticeOpen(false); }}
                   >
                     <BarChart2 size={15} color="#0F766E" /> Aptitude Test
                   </button>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'setup' || activeTab === 'live' ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'setup' || activeTab === 'live' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'setup' || activeTab === 'live' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'setup' || activeTab === 'live' ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('setup'); setPracticeOpen(false); }}
                   >
                     <PlayCircle size={15} color="#2563EB" /> Mock Interview
                   </button>
                   <button 
-                    className="btn"
-                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'coding' ? '#F1F5F9' : 'transparent', color: '#0F172A', fontWeight: activeTab === 'coding' ? '700' : '500', padding: '0.45rem 0.75rem' }}
+                    className="btn nav-dropdown-item"
+                    style={{ justifyContent: 'flex-start', border: 'none', background: activeTab === 'coding' ? 'var(--soft-blue)' : 'transparent', color: 'var(--main-heading)', fontWeight: activeTab === 'coding' ? '700' : '500', padding: '0.45rem 0.75rem' }}
                     onClick={() => { setActiveTab('coding'); setPracticeOpen(false); }}
                   >
                     <Code size={15} color="#1E3A5F" /> Coding IDE
@@ -188,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
             {/* Admin (if admin role) */}
             {isAdmin && (
               <button 
-                style={getNavBtnStyle(activeTab === 'admin')}
+                className={getNavBtnClass(activeTab === 'admin')}
                 onClick={() => {
                   setActiveTab('admin');
                   setCareerOpen(false);
@@ -199,18 +189,25 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
               </button>
             )}
 
+            {/* Theme Toggle Feature (Top Right) */}
+            <div style={{ marginLeft: '0.35rem', marginRight: '0.15rem' }}>
+              <ThemeToggle showLabel={false} />
+            </div>
+
             {/* Logout */}
             <button 
-              className="btn btn-outline" 
+              className="btn btn-outline nav-logout-btn" 
               onClick={logout} 
               title="Logout" 
-              style={{ gap: '0.35rem', color: '#475569', borderColor: '#E2E8F0', padding: '0.5rem 0.85rem' }}
+              style={{ gap: '0.35rem', padding: '0.5rem 0.85rem', marginLeft: '0.25rem' }}
             >
               <LogOut size={16} /> Logout
             </button>
           </nav>
         ) : (
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {/* Theme Toggle in Guest Mode */}
+            <ThemeToggle showLabel={false} />
             <button className="btn btn-outline" onClick={() => setActiveTab('login')}>Sign In</button>
             <button className="btn btn-action" onClick={() => setActiveTab('register')}>Register</button>
           </div>
