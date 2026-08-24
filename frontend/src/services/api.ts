@@ -101,6 +101,7 @@ export const api = {
 
   // Analytics
   getDashboard: () => request<any>('/analytics/dashboard'),
+  getDashboardMetrics: () => request<any>('/analytics/dashboard'),
   getAdminAnalytics: () => request<any>('/analytics/admin'),
 
   // Admin
