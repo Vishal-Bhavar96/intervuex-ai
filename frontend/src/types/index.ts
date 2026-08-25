@@ -47,6 +47,7 @@ export interface CandidateProfile {
   target_role?: string;
   experience_level?: string;
   preferred_industry?: string;
+  profile_picture_url?: string;
   educations: Education[];
   skills: Skill[];
   projects: Project[];

@@ -13,6 +13,7 @@ class CandidateProfile(Base):
     target_role = Column(String(255), nullable=True)
     experience_level = Column(String(50), default="Entry-Level")  # Entry-Level, Mid-Level, Senior
     preferred_industry = Column(String(255), nullable=True)
+    profile_picture_url = Column(Text, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 

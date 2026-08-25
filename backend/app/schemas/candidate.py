@@ -50,6 +50,7 @@ class CandidateProfileUpdate(BaseModel):
     target_role: Optional[str] = None
     experience_level: Optional[str] = None
     preferred_industry: Optional[str] = None
+    profile_picture_url: Optional[str] = None
 
 class CandidateProfileResponse(BaseModel):
     id: int
@@ -59,6 +60,7 @@ class CandidateProfileResponse(BaseModel):
     target_role: Optional[str] = None
     experience_level: Optional[str] = None
     preferred_industry: Optional[str] = None
+    profile_picture_url: Optional[str] = None
     educations: List[EducationSchema] = []
     skills: List[SkillSchema] = []
     projects: List[ProjectSchema] = []

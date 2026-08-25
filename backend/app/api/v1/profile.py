@@ -1,7 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+import os
+import shutil
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
 from typing import List
 
+from app.config import settings
 from app.core.database import get_db
 from app.api.v1.auth import get_current_user
 from app.models.user import User
@@ -39,7 +43,54 @@ def update_candidate_profile(
     if profile_in.target_role is not None: profile.target_role = profile_in.target_role
     if profile_in.experience_level is not None: profile.experience_level = profile_in.experience_level
     if profile_in.preferred_industry is not None: profile.preferred_industry = profile_in.preferred_industry
+    if profile_in.profile_picture_url is not None: profile.profile_picture_url = profile_in.profile_picture_url
 
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+@router.post("/avatar", response_model=CandidateProfileResponse)
+async def upload_profile_avatar(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == current_user.id).first()
+    if not profile:
+        profile = CandidateProfile(user_id=current_user.id)
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+
+    filename = file.filename or "avatar.jpg"
+    ext = filename.split(".")[-1].lower()
+    allowed = ["jpg", "jpeg", "png", "webp", "gif"]
+    if ext not in allowed:
+        raise HTTPException(status_code=400, detail=f"Invalid image type '{ext}'. Allowed formats: {', '.join(allowed)}")
+
+    avatar_dir = os.path.join(settings.UPLOAD_DIR, "avatars")
+    os.makedirs(avatar_dir, exist_ok=True)
+    unique_filename = f"user_{current_user.id}_{uuid.uuid4().hex[:8]}.{ext}"
+    file_path = os.path.join(avatar_dir, unique_filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    profile.profile_picture_url = f"/uploads/avatars/{unique_filename}"
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+@router.delete("/avatar", response_model=CandidateProfileResponse)
+def delete_profile_avatar(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    profile = db.query(CandidateProfile).filter(CandidateProfile.user_id == current_user.id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    profile.profile_picture_url = None
     db.commit()
     db.refresh(profile)
     return profile

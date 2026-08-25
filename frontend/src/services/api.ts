@@ -55,6 +55,24 @@ export const api = {
   // Profile
   getProfile: () => request<any>('/profile'),
   updateProfile: (data: any) => request<any>('/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  uploadAvatar: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('intervuex_token');
+    const res = await fetch(`${API_BASE}/profile/avatar`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new ApiError(err.detail || 'Photo upload failed', res.status);
+    }
+    return res.json();
+  },
+  deleteAvatar: () => request<any>('/profile/avatar', { method: 'DELETE' }),
   addEducation: (data: any) => request<any>('/profile/education', { method: 'POST', body: JSON.stringify(data) }),
   addSkill: (data: any) => request<any>('/profile/skill', { method: 'POST', body: JSON.stringify(data) }),
   deleteSkill: (skillId: number) => request<any>(`/profile/skill/${skillId}`, { method: 'DELETE' }),
